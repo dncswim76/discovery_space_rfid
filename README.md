@@ -31,4 +31,4 @@
    `alias psucse="cd ~/discovery_space_rfid; workon psucse"`
 
 5. Install requirements:
-   `$ pip install requirements/requirements.txt`
+   `$ pip install -r requirements/requirements.txt`
