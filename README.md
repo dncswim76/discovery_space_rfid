@@ -7,11 +7,11 @@
 3. virtualenv
    `$ pip install virtualenv`
 4. virtualenvwrapper
-   ```
+```
    $ pip install virtualenvwrapper
    $ export WORKON_HOME=~/Envs
    $ source /usr/local/bin/virtualenvwrapper.sh
-   ```
+```
 
 ## To get started:
 
