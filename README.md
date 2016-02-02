@@ -1,11 +1,12 @@
 # discovery_space_rfid
 
 ## Prerequisites
-  * Python 2.7
-  * pip
-  * virtualenv
+
+1. Python 2.7
+2. pip
+3. virtualenv
    `$ pip install virtualenv`
-  * virtualenvwrapper
+4. virtualenvwrapper
    ```
    $ pip install virtualenvwrapper
    $ export WORKON_HOME=~/Envs
@@ -15,7 +16,10 @@
 ## To get started:
 
 1. Clone the repository and cd into directory:
-   `$ git clone git@github.com:jdn5126/discovery_space_rfid.git && cd discovery_space_rfid`
+   `$ git clone git@github.com:jdn5126/discovery_space_rfid.git`
+
+2. cd into directory:
+   `$ cd discovery_space_rfid`
 
 2. Create a virtual environment:
    `$ mkvirtualenv psucse`
