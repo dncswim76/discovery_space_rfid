@@ -1,4 +1,5 @@
 from app import db
+from flask import session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 class User(db.Model):
@@ -6,11 +7,9 @@ class User(db.Model):
 
     __tablename__ = 'admin_user'
     
-    id = db.Column('user_id', db.Integer, primary_key=True)
+    id = db.Column('id', db.Integer, primary_key=True)
     username = db.Column(db.String(50))
     password = db.Column(db.String(120))
-    authenticated = db.Column(db.Boolean, default=False)
-    last_login = db.Column(db.DateTime)
 
     def __init__(self, username, password):
         self.username = username
@@ -18,13 +17,17 @@ class User(db.Model):
 
     @property
     def is_active(self):
-        ''' Admin user is implicitly active.'''
+        ''' User is implicitly active.'''
         return True
 
     @property
     def is_authenticated(self):
         ''' Return True is user is authenticated.'''
-        return self.authenticated
+
+        if 'authenticated' in session:
+            return session['authenticated']
+        else:
+            return False
 
     @property
     def is_anonymous(self):
