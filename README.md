@@ -30,3 +30,9 @@
 
 5. Install requirements:
    `$ pip install -r requirements/requirements.txt`
+
+6. Configure Database
+   `$ python run.py db upgrade`
+
+7. Run locally in debug mode
+   `$ python run.py runserver -d`
