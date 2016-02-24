@@ -5,13 +5,7 @@
 1. Python 2.7
 2. pip
 3. virtualenv
-   `$ pip install virtualenv`
 4. virtualenvwrapper
-   ```
-   $ pip install virtualenvwrapper
-   $ export WORKON_HOME=~/Envs
-   $ source /usr/local/bin/virtualenvwrapper.sh
-   ```
 
 ## To get started:
 
@@ -28,7 +22,11 @@
    `$ workon psucse`
 
 4. (Optional) Add the following to ~/.bash_profile:
-   `alias psucse="cd ~/discovery_space_rfid; workon psucse"`
+   ```
+   $ export WORKON_HOME=~/Envs
+   $ source /usr/local/bin/virtualenvwrapper.sh
+   alias psucse="cd ~/discovery_space_rfid; workon psucse"
+   ```
 
 5. Install requirements:
    `$ pip install -r requirements/requirements.txt`
