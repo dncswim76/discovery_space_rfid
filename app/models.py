@@ -8,8 +8,8 @@ class User(db.Model):
     __tablename__ = 'admin_user'
     
     id = db.Column('id', db.Integer, primary_key=True)
-    username = db.Column(db.String(50))
-    password = db.Column(db.String(120))
+    username = db.Column('Username', db.String(50), unique=True, nullable=False)
+    password = db.Column('Password', db.String(120), nullable=False)
 
     def __init__(self, username, password):
         self.username = username
@@ -50,3 +50,88 @@ class User(db.Model):
     def __repr__(self):
         return self.username
 
+
+class GameMode(db.Model):
+    ''' Game modes that application supports.
+
+        Application currently supports
+        "open" and "blocking" modes.'''
+    
+    __tablename__ = 'game_modes'
+
+    id = db.Column('id', db.Integer, primary_key=True)
+    mode = db.Column('Mode', db.String(50))
+    games = db.relationship('Game', backref='game_mode_id', lazy='dynamic')
+
+    def __repr__(self):
+        return self.mode
+
+
+# A Game has many Devices and a Device can belong to many games, therefore
+# we define the following helper table for this relationship.
+game_device_link = db.Table('GameDeviceLink', 
+            db.Column('id', db.Integer, primary_key=True),
+            db.Column('game_id', db.Integer,
+                    db.ForeignKey('games.id'), nullable=False),
+            db.Column('device_id', db.Integer,
+                    db.ForeignKey('devices.id'), nullable=False))
+
+class Game(db.Model):
+    ''' Represents a game that was created.'''
+
+    __tablename__ = 'games'
+
+    id = db.Column('id', db.Integer, primary_key=True)
+    title = db.Column('Title', db.String(50))
+    description = db.Column('Description', db.Text)
+    game_mode = db.Column('Mode', db.Integer, db.ForeignKey('game_modes.id'))
+    devices = db.relationship('Device',
+            secondary=game_device_link,
+            backref='game',
+            lazy='dynamic')
+
+    def __repr__(self):
+        return self.title
+
+
+class Device(db.Model):
+    ''' Object with an embedded RFID chip.
+
+        Each objects points to a file on the 
+        Raspberry Pi (/dev/null by default).'''
+
+    __tablename__ = 'devices'
+
+    id = db.Column('id', db.Integer, primary_key=True)
+    name = db.Column('Name', db.String(50))
+    description = db.Column('Description', db.Text)
+    rfid_tag = db.Column('Tag', db.String(50))
+    file_loc = db.Column('FileLocation', db.Text, default='/dev/null')
+
+    def __repr__(self):
+        return self.name
+
+
+class Member(db.Model):
+    ''' RFID membership card for patrons.'''
+
+    __tablename__ = 'members'
+
+    id = db.Column('id', db.Integer, primary_key=True)
+    member_first_name = db.Column('FirstName', db.String(50))
+    member_last_name = db.Column('LastName', db.String(50))
+    card_number = db.Column('CardNumber', db.String(50))
+    visits = db.relationship('MemberVisit', backref='member_id', lazy='dynamic')
+
+    def __repr__(self):
+        return self.first_name + " " + self.last_name
+
+
+class MemberVisit(db.Model):
+    ''' Log of visits by member.'''
+
+    __tablename__ = 'member_visits'
+
+    id = db.Column('id', db.Integer, primary_key=True)
+    member = db.Column('MemberID', db.Integer, db.ForeignKey('members.id'))
+    date = db.Column('Date', db.DateTime)       

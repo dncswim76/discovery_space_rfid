@@ -60,3 +60,4 @@ target/
 
 # Project Specific Ignores
 tmp/*
+*.db
