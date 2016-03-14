@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import flash, g, redirect, render_template, request, session, url_for
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from .forms import LoginForm
-from .models import User
+from .models import Game, GameMode, User
 
 
 @app.before_request
@@ -57,8 +57,46 @@ def load_user(user_id):
 
 
 @app.route('/games')
-@login_required
 def games():
-    ''' Main page for RFID games.'''
+    ''' Choose game mode or edit games if admin.'''
     
-    return "Hello, World" 
+    return render_template('games.html')
+
+
+@app.route('/games/learn')
+def learn():
+    ''' Listing of learning games.'''
+
+    # Get list of all games of type learning
+    games = Game.query.join(GameMode).filter(
+                GameMode.mode == "learning").order_by('title')
+    return render_template('learning.html', games=games)
+
+
+@app.route('/games/learn/<int:game_id>')
+def learning_game(game_id):
+    ''' Format for learning games.'''
+
+    return "Hello, World"
+
+
+@app.route('/games/challenge')
+def challenge():
+    ''' Listing of challenge games.'''
+
+    return "Hello, World"
+
+
+@app.route('/games/challenge/<int:game_id>')
+def challenge_game(game_id):
+    ''' Format for challenge games.'''
+
+    return "Hello, World"
+
+
+@app.route('/games/manage', methods=['GET', 'POST'])
+@login_required
+def manage_games():
+    ''' Interface for admins to edit games.'''
+
+    return "Hello, World"

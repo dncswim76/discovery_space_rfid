@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+    <!-- Table to display learning games.-->
+    <table>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Play Now!</th>
+        </tr>
+        {% for game in games %}
+        <tr>
+            <td>{{ game.title }}</td>
+            <td>{{ game.description }}</td>
+            <td><a href="{{ url_for('learning_game', game.id) }}">Play</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

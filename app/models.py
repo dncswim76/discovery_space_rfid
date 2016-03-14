@@ -85,6 +85,7 @@ class Game(db.Model):
     title = db.Column('Title', db.String(50))
     description = db.Column('Description', db.Text)
     game_mode = db.Column('Mode', db.Integer, db.ForeignKey('game_modes.id'))
+    questions = db.relationship('Question', backref='game_id', lazy='dynamic')
     devices = db.relationship('Device',
             secondary=game_device_link,
             backref='game',
@@ -110,6 +111,28 @@ class Device(db.Model):
 
     def __repr__(self):
         return self.name
+
+
+class Question(db.Model):
+    ''' Certain game modes prompt for a specific set of RFID tags.
+
+        Each Question is linked to the game that it belongs to.'''
+
+    __tablename__ = 'questions'
+
+    id = db.Column('id', db.Integer, primary_key=True)
+    question = db.Column('Question', db.Text)
+    game = db.Column('Game', db.Integer, db.ForeignKey('games.id'))
+
+
+# A Question can have many RFID tags as an answer and an RFID tag can be
+# an answer to many Questions, so we define the following helper table.
+answers = db.Table('answers', 
+            db.Column('id', db.Integer, primary_key=True),
+            db.Column('question_id', db.Integer,
+                    db.ForeignKey('questions.id'), nullable=False),
+            db.Column('device_id', db.Integer,
+                    db.ForeignKey('devices.id'), nullable=False))
 
 
 class Member(db.Model):
