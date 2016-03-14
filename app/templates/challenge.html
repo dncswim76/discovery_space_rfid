@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-    <!-- Table to display learning games.-->
+    <!-- Table to display challenge games.-->
     <table>
         <tr>
             <th>Title</th>
@@ -11,7 +11,7 @@
         <tr>
             <td>{{ game.title }}</td>
             <td>{{ game.description }}</td>
-            <td><a href="{{ url_for('learning_game', game_id=game.id) }}">Play</a></td>
+            <td><a href="{{ url_for('challenge_game', game.id) }}">Play</a></td>
         </tr>
         {% endfor %}
     </table>

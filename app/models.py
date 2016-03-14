@@ -55,7 +55,7 @@ class GameMode(db.Model):
     ''' Game modes that application supports.
 
         Application currently supports
-        "open" and "blocking" modes.'''
+        "learning" and "challenge" mode.'''
     
     __tablename__ = 'game_modes'
 
