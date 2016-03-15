@@ -1,9 +1,14 @@
+import os
 from app import app, db, login_manager
 from datetime import datetime
 from flask import flash, g, redirect, render_template, request, session, url_for
 from flask.ext.login import login_user, logout_user, current_user, login_required
+from sqlalchemy import text
+from werkzeug import secure_filename
+
 from .forms import LoginForm
-from .models import Game, GameMode, User
+from .models import Device, Game, game_device_link, GameMode, Question, question_answer_link, User
+from .utils import allowed_file
 
 
 @app.before_request
@@ -113,11 +118,13 @@ def manage_games():
             db.session.delete(game)
             db.session.commit()
             # report that game was deleted and reload page
-            flash(u'Successfully deleted %s.' % game.title)
+            flash(u'Successfully deleted %s.' % title)
             return redirect(url_for('manage_games'))
         # if a game is to be created, make a new game and redirect to its page
         elif "create" in request.form:
-            game = Game(title="Default", description="default", game_mode=None)
+            # default to first game mode
+            game_mode = GameMode.query.all()[0].id
+            game = Game(title="Default", description="default", game_mode=game_mode)
             db.session.add(game)
             db.session.commit()
             # redirect to game's edit page
@@ -134,9 +141,113 @@ def manage_games():
                 challenge_games=challenge_games)
 
 
-@app.route('/games/manage/<int:game_id>')
+@app.route('/games/manage/<int:game_id>', methods=['GET', 'POST'])
 @login_required
 def edit_game(game_id):
     ''' Interface for admin to create or edit games.'''
 
-    return "Hello, World"
+    # if POST, handle edits
+    if request.method == "POST":
+        # Get game it exists
+        game = Game.query.get_or_404(game_id)
+        game_mode = GameMode.query.get_or_404(game.game_mode)
+        # Check if game mode needs to be changed
+        if "change_mode" in request.form:
+            mode = request.form.get('mode', type=int)
+            # if new mode is present in request, update game mode
+            if not mode:
+                flash(u'Invalid game mode selected.')
+            elif game.game_mode != mode:
+                game_mode = GameMode.query.get(mode)
+                game.game_mode = game_mode.id
+                db.session.commit()
+        # Handle adding RFID
+        elif "add" in request.form:
+            # Make sure a valid name is entered
+            name = request.form.get('device_name', type=str)
+            if not name:
+                flash(u'Invalid device name.')
+                return redirect(url_for('edit_game', game_id=game_id))
+            # Make sure a valid description is entered
+            description = request.form.get('device_description', type=str)
+            if not description:
+                flash(u'Invalid device description.')
+                return redirect(url_for('edit_game', game_id=game_id))
+            # Make sure valid RFID tag is entered
+            tag = request.form.get('device_tag', type=str)
+            if not tag:
+                flash(u'Invalid rfid tag.')
+                return redirect(url_for('edit_game', game_id=game_id))
+            # Get file to upload
+            file = request.files['file']
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file_loc = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(file_loc)
+            else:
+                flash('Invalid file.')
+                return redirect(url_for('edit_game', game_id=game_id))
+            # Now that everything is good, create Device and link it
+            device = Device(name=name, description=description, rfid_tag=tag, file_loc=filename)
+            db.session.add(device)
+            db.session.commit()
+            # Custom execution because of linking table...
+            # TODO: Issue #1
+            connection = db.session.connection()
+            # get new primary key value
+            sql = text("SELECT MAX(id) from GameDeviceLink")
+            result = connection.execute(sql)
+            result_key = result.first()[0]
+            # either increment the primary key or set it to 1
+            if result_key:
+                new_primary = result.first()[0] + 1
+            else:
+                new_primary = 1
+            sql = text("INSERT INTO GameDeviceLink VALUES(%s,%s,%s)" % (new_primary,game_id, device.id))
+            connection.execute(sql)
+            db.session.commit()
+        # handle deleting RFID
+        elif "the_device" in request.form:
+            # Get rfid to delete
+            device_id = request.form.get('device_id', type=int)
+            device = Device.query.get(device_id)
+            name = device.name
+            # Delete rfid
+            db.session.delete(device)
+            db.session.commit()
+            flash(u'Successfully deleted %s.' % name) 
+        elif "add_question" in request.form:
+            pass
+        elif "add_answer" in request.form:
+            pass
+        # if we get here, render GET request
+        return redirect(url_for('edit_game', game_id=game_id))
+    # otherwise, get data for template
+    else:
+        # Get Game and GameMode
+        game = Game.query.get(game_id)
+        current_mode = GameMode.query.get(game.game_mode)
+        # Get all game modes
+        game_modes = GameMode.query.order_by('mode').all()
+        # Get all RFIDs associated with game
+        devices = Device.query.join(Game.devices).filter(
+                    Game.id == game_id).all()
+        # if game is of type challenge, get questions and answers
+        questions = None
+        answers = []
+        if current_mode.mode == "challenge":
+            # Get all Questions associated with game
+            questions = Question.query.join(Game).filter(
+                    Game.id == game_id).order_by('question')
+            # get answers for each question
+            for question in questions:
+                answers.append(Question.query.join(Question.answers).filter(
+                                    Question.id == question.id).all())
+        # render template with attributes
+        return render_template('edit_games.html',
+                    game=game,
+                    current_mode=current_mode,
+                    game_modes=game_modes,
+                    devices=devices,
+                    questions=questions,
+                    answers=answers)

@@ -113,6 +113,16 @@ class Device(db.Model):
         return self.name
 
 
+# A Question can have many RFID tags as an answer and an RFID tag can be
+# an answer to many Questions, so we define the following helper table.
+question_answer_link = db.Table('QuestionAnswerLink', 
+            db.Column('id', db.Integer, primary_key=True),
+            db.Column('question_id', db.Integer,
+                    db.ForeignKey('questions.id'), nullable=False),
+            db.Column('device_id', db.Integer,
+                    db.ForeignKey('devices.id'), nullable=False))
+
+
 class Question(db.Model):
     ''' Certain game modes prompt for a specific set of RFID tags.
 
@@ -123,16 +133,10 @@ class Question(db.Model):
     id = db.Column('id', db.Integer, primary_key=True)
     question = db.Column('Question', db.Text)
     game = db.Column('Game', db.Integer, db.ForeignKey('games.id'))
-
-
-# A Question can have many RFID tags as an answer and an RFID tag can be
-# an answer to many Questions, so we define the following helper table.
-answers = db.Table('answers', 
-            db.Column('id', db.Integer, primary_key=True),
-            db.Column('question_id', db.Integer,
-                    db.ForeignKey('questions.id'), nullable=False),
-            db.Column('device_id', db.Integer,
-                    db.ForeignKey('devices.id'), nullable=False))
+    answers = db.relationship('Device',
+            secondary=question_answer_link,
+            backref='question',
+            lazy='dynamic')
 
 
 class Member(db.Model):

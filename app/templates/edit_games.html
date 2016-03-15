@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='edit.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+    <!-- Select Game Mode.-->
+    <form action="" method="post" id="choose_game_mode">
+        <b>Game Mode:</b>
+        <select name="mode">
+        <option></option>
+        {% for game_mode in game_modes %}
+            <option {% if current_mode.id == game_mode.id %}selected {% endif %}value="{{ game_mode.id }}">{{ game_mode.mode }}</option>
+        {% endfor %}
+        </select>
+        <input name="change_mode" type="submit" value="Submit" />
+    </form>
+    <!-- Display RFID tags with option to delete.-->
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Tag</th>
+            <th>Media</th>
+            <th>Delete?</th>
+        </tr>
+        {% for device in devices %}
+        <tr>
+            <td>{{ device.name }}</td>
+            <td>{{ device.description }}</td>
+            <td>{{ device.rfid_tag }}</td>
+            <td>{{ device.file_loc }}</td>
+            <form action="" method="post" name="delete_device">
+                <input name="device_id" type="hidden" value="{{ device.id }}" />
+                <td><input name="the_device" type="submit" value="Yes" /></td>
+            </form> 
+        </tr>
+        {% endfor %}
+    </table>
+    <!-- Option to add RFID object.-->
+    <form action="" method="post" name="add_device" enctype=multipart/form-data>
+        <input name="device_name" type="text" value="Name" />
+        <input name="device_description" type="text" value="Description" />
+        <input name="device_tag" type="text" value="RFID Tag" />
+        <input name="file" type="file">
+        <input name="add" type="submit" value="Add" />
+    </form>
+{% endblock %}
