@@ -151,16 +151,33 @@ def edit_game(game_id):
         # Get game it exists
         game = Game.query.get_or_404(game_id)
         game_mode = GameMode.query.get_or_404(game.game_mode)
-        # Check if game mode needs to be changed
-        if "change_mode" in request.form:
+        # Check if game attribtues need to be changed
+        if "edit_game" in request.form:
+            edit = True
+            # Check if title needs to be changed
+            title = request.form.get('game_title', type=str)
+            if not title:
+                edit = False
+                flash(u'Invalid title.')
+            # Check if description needs to changed
+            description = request.form.get('game_description', type=str)
+            if not description:
+                edit = False
+                flash(u'Invalid description.')
+            # Check if game mode needs to be changed
             mode = request.form.get('mode', type=int)
             # if new mode is present in request, update game mode
             if not mode:
+                edit = False
                 flash(u'Invalid game mode selected.')
-            elif game.game_mode != mode:
+            # if we can edit, apply changes
+            if edit:
+                game.title = title
+                game.description = description
                 game_mode = GameMode.query.get(mode)
                 game.game_mode = game_mode.id
                 db.session.commit()
+
         # Handle adding RFID
         elif "add_rfid" in request.form:
             # Make sure a valid name is entered
@@ -195,12 +212,13 @@ def edit_game(game_id):
             device_link = game_device_link.insert().values(game_id=game_id, device_id=device.id)
             db.session.execute(device_link)
             db.session.commit()
-        # handle deleting RFID and associated media
+
+        # Handle deleting RFID and associated media
         elif "the_device" in request.form:
             # Get rfid to delete
             device_id = request.form.get('device_id', type=int)
             device = Device.query.get(device_id)
-            name = device.name
+            device_name = device.name
             # get file location to delete
             filename = os.path.join(app.config['UPLOAD_FOLDER'], device.file_loc)
             # try to delete file
@@ -211,13 +229,42 @@ def edit_game(game_id):
             # Delete rfid
             db.session.delete(device)
             db.session.commit()
-            flash(u'Successfully deleted %s.' % name) 
+            flash(u'Successfully deleted %s.' % device_name)
+
+        # Handle adding new Question and associated answers
         elif "add_question" in request.form:
-            pass
-        elif "add_answer" in request.form:
-            pass
+            # Get question prompt and create Question
+            question_text = request.form.get('question_text', type=str)
+            q = Question(question=question_text, game=game_id)
+            db.session.add(q)
+            # Get answers to question
+            answers = request.form.getlist('answers')
+            # Return an error if no answers are selected
+            if not answers:
+                flash(u'Question must have at least one answer.')
+                return redirect(url_for('edit_game', game_id=game_id))
+            # Otherwise, create question and link answers
+            else:
+                db.session.commit()
+                for answer in answers:
+                    answer_link = question_answer_link.insert().values(question_id=q.id, device_id=answer)
+                    db.session.execute(answer_link)
+                    db.session.commit()
+        
+        # Handle deleting Question and associated answers
+        elif "the_question" in request.form:
+            # Get question to delete
+            question_id = request.form.get('question_id', type=int)
+            question = Question.query.get(question_id)
+            question_name = question.question
+            # Delete question
+            db.session.delete(question)
+            db.session.commit()
+            flash(u'Successfully deleted %s.' % question_name)
+
         # if we get here, render GET request
         return redirect(url_for('edit_game', game_id=game_id))
+
     # otherwise, GET data for template
     else:
         # Get Game and GameMode
@@ -235,9 +282,9 @@ def edit_game(game_id):
             # Get all Questions associated with game
             questions = Question.query.join(Game).filter(
                     Game.id == game_id).order_by('question')
-            # get answers for each question
+            # Get answers for each question
             for question in questions:
-                answers.append(Question.query.join(Question.answers).filter(
+                answers.append(Device.query.join(Question.answers).filter(
                                     Question.id == question.id).all())
         # render template with attributes
         return render_template('edit_games.html',

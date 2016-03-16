@@ -6,17 +6,25 @@
 
 {% block content %}
     <!-- Select Game Mode.-->
-    <form action="" method="post" id="choose_game_mode">
-        <b>Game Mode:</b>
+    <div class="section_content">
+    <h1>Edit Game</h1>
+    <form action="" method="post" id="edit_game_fields">
+        <b>Title: </b><input name="game_title" type="text" value="{{ game.title }}" /><br>
+        <b>Description: </b><input name="game_description" type="text" value="{{ game.description }}" /><br>
+        <b>Game Mode: </b>
         <select name="mode">
         <option></option>
         {% for game_mode in game_modes %}
             <option {% if current_mode.id == game_mode.id %}selected {% endif %}value="{{ game_mode.id }}">{{ game_mode.mode }}</option>
         {% endfor %}
         </select>
-        <input name="change_mode" type="submit" value="Submit" />
+        <br><input name="edit_game" type="submit" value="Submit" />
     </form>
+    </div>
+
     <!-- Display RFID tags with option to delete.-->
+    <div class="section_content">
+    <h1>Add/Edit Devices</h1>
     <table>
         <tr>
             <th>Name</th>
@@ -46,4 +54,48 @@
         <input name="file" type="file">
         <input name="add_rfid" type="submit" value="Add" />
     </form>
+    </div>
+
+    {% if current_mode.mode == "challenge" %}
+        <!-- Display Questions with option to delete.-->
+        <div class="section_content">
+        <h1>Add/Edit Questions</h1>
+        <table>
+            <tr>
+                <th>Number</th>
+                <th>Question</th>
+                <th>Answers</th>
+                <th>Delete?</th>
+            </tr>
+            {% for question in questions %}
+            {% set q_count = loop.index0 %}
+            <tr>
+                <td>{{ q_count + 1 }}</td>
+                <td>{{ question.question }}</td>
+                <!-- Display answers to question.-->
+                <td><ol>
+                {% for answer in answers[q_count] %}
+                    <li>{{ answer.name }}</li>
+                {% endfor %}
+                </ol></td>
+                <form action="" method="post" name="delete_question">
+                    <input name="question_id" type="hidden" value="{{ question.id }}" />
+                    <td><input name="the_question" type="submit" value="Yes" /></td>
+                </form> 
+            </tr>
+            {% endfor %}
+        </table>
+        <!-- Option to add Question object.-->
+        <form action="" method="post" name="add_question">
+            <input name="question_text" type="text" value="Question Prompt" />
+            <!-- Select answers to Question.-->
+            <select multiple name="answers">
+            {% for device in devices %}
+                <option value="{{ device.id }}">{{ device.name }}</option>
+            {% endfor %}
+            </select>
+            <input name="add_question" type="submit" value="Add" />
+        </form>
+        </div>
+    {% endif %}
 {% endblock %}
