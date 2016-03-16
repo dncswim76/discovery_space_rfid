@@ -162,7 +162,7 @@ def edit_game(game_id):
                 game.game_mode = game_mode.id
                 db.session.commit()
         # Handle adding RFID
-        elif "add" in request.form:
+        elif "add_rfid" in request.form:
             # Make sure a valid name is entered
             name = request.form.get('device_name', type=str)
             if not name:
@@ -185,33 +185,29 @@ def edit_game(game_id):
                 file_loc = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(file_loc)
             else:
-                flash('Invalid file.')
+                flash(u'Invalid file.')
                 return redirect(url_for('edit_game', game_id=game_id))
             # Now that everything is good, create Device and link it
             device = Device(name=name, description=description, rfid_tag=tag, file_loc=filename)
             db.session.add(device)
             db.session.commit()
-            # Custom execution because of linking table...
-            # TODO: Issue #1
-            connection = db.session.connection()
-            # get new primary key value
-            sql = text("SELECT MAX(id) from GameDeviceLink")
-            result = connection.execute(sql)
-            result_key = result.first()[0]
-            # either increment the primary key or set it to 1
-            if result_key:
-                new_primary = result.first()[0] + 1
-            else:
-                new_primary = 1
-            sql = text("INSERT INTO GameDeviceLink VALUES(%s,%s,%s)" % (new_primary,game_id, device.id))
-            connection.execute(sql)
+            # Add entry to linking table
+            device_link = game_device_link.insert().values(game_id=game_id, device_id=device.id)
+            db.session.execute(device_link)
             db.session.commit()
-        # handle deleting RFID
+        # handle deleting RFID and associated media
         elif "the_device" in request.form:
             # Get rfid to delete
             device_id = request.form.get('device_id', type=int)
             device = Device.query.get(device_id)
             name = device.name
+            # get file location to delete
+            filename = os.path.join(app.config['UPLOAD_FOLDER'], device.file_loc)
+            # try to delete file
+            try:
+                os.remove(filename)
+            except OSError:
+                flash(u'File %s does not exist.' % device.file_loc)
             # Delete rfid
             db.session.delete(device)
             db.session.commit()
@@ -222,7 +218,7 @@ def edit_game(game_id):
             pass
         # if we get here, render GET request
         return redirect(url_for('edit_game', game_id=game_id))
-    # otherwise, get data for template
+    # otherwise, GET data for template
     else:
         # Get Game and GameMode
         game = Game.query.get(game_id)
