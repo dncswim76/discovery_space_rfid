@@ -1,9 +1,20 @@
 <html>
   <head>
     <title>Discovery Space Museum</title>
+    <!-- CSS -->
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static', filename='css/theme.css') }}">
+    {% block css %}{% endblock %}
   </head>
   <body>
-    <div><a href="/home">Home</a></div>
+    <div>
+    <a href="/home">Home</a>
+    {% if session.authenticated %}
+        <a href="/logout">Logout</a>
+    {% else %}
+        <a href="/login">Login</a>
+    {% endif %}
+    <a href="/games">Games</a>
+    </div>
     <hr>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
