@@ -3,12 +3,14 @@
     <!-- Table to display learning games.-->
     <table>
         <tr>
+            <th></th>
             <th>Title</th>
             <th>Description</th>
             <th>Play Now!</th>
         </tr>
         {% for game in games %}
         <tr>
+            <td>{{ loop.index }}</td>
             <td>{{ game.title }}</td>
             <td>{{ game.description }}</td>
             <td><a href="{{ url_for('learning_game', game_id=game.id) }}">Play</a></td>

@@ -78,11 +78,50 @@ def learn():
     return render_template('learning.html', games=games)
 
 
-@app.route('/games/learn/<int:game_id>')
+@app.route('/games/learn/<int:game_id>', methods=['GET', 'POST'])
 def learning_game(game_id):
     ''' Format for learning games.'''
 
-    return "Hello, World"
+    # Get game
+    game = Game.query.get_or_404(game_id)
+
+    # Handle POST request
+    if request.method == "POST":
+        # Get RFID tag
+        tag = request.form.get('device_tag', type=str)
+        # Check if RFID tag is associated with game
+        device = Device.query.join(Game.devices).filter(
+                    Game.id == game_id).filter(
+                    Device.rfid_tag == tag).first()
+        # If the scanned tag does not correspond to the game, print error
+        if not device:
+            flash(u'Scanned object is not part of %s game.' % game.title)
+            return redirect(url_for('learning_game', game_id=game_id))
+        # Otherwise, display information on device
+        else:
+            # Get filename
+            file_loc = "/static/media/" + device.file_loc
+            # Determine type of media
+            extension = device.file_loc.split('.')[-1]
+            if extension in ['png', 'jpg', 'jpeg', 'gif']:
+                media = "image"
+            elif extension in ['mp3']:
+                media = "audio"
+            elif extension in ['mp4']:
+                media = "video"
+            return render_template('learning_game.html',
+                        game=game,
+                        device=device,
+                        file_loc=file_loc,
+                        media=media)
+    # GET request
+    else:
+        # If game is of incorrect mode, return to games page
+        if GameMode.query.get(game.game_mode).mode != "learning":
+            flash(u'%s is not a learning mode game.' % game.title)
+            return redirect(url_for('games'))
+    
+        return render_template('learning_game.html', game=game)
 
 
 @app.route('/games/challenge')
@@ -99,8 +138,14 @@ def challenge():
 def challenge_game(game_id):
     ''' Format for challenge games.'''
 
-    return "Hello, World"
-
+    # Get game
+    game = Game.query.get(game_id)
+    # If game is of incorrect mode, return to games page
+    if GameMode.query.get(game.game_mode).mode != "challenge":
+        flash(u'%s is not a challenge mode game.' % game.title)
+        return redirect(url_for('games'))
+    
+    return render_template('challenge_game.html', game=game)
 
 @app.route('/games/manage', methods=['GET', 'POST'])
 @login_required

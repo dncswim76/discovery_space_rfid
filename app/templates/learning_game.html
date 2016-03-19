@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='learning.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+    <!-- Display game information.-->
+    <div>
+        <h1>{{ game.title }}</h1>
+        <h2>{{ game.description }}</h2>
+    </div>
+
+    <!-- Input box for RFID tag.-->
+    <p>Scan object!</p>
+    <form action="" method="post" name="scan_device">
+        <input name="device_tag" type="text" value="RFID Tag" />
+    </form>
+
+    <!-- Display device information.-->
+    {% if device %}
+        <div>
+            <p>{{ device.name }}</p>
+            <p>{{ device.description }}</p>
+            {% if media == "image" %}
+                <img src="{{ file_loc }}"></img>
+            {% elif media == "audio" %}
+                <audio controls>
+                    <source src="{{ file_loc }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            {% elif media == "video" %}
+                <video id="video" width="320" controls>
+                    <source src="{{ file_loc }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock %}

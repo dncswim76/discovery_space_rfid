@@ -2,8 +2,11 @@
   <head>
     <title>Discovery Space Museum</title>
     <!-- CSS -->
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static', filename='css/theme.css') }}">
+    <link rel= "stylesheet" type="text/css" href= "{{ url_for('static', filename='css/theme.css') }}">
     {% block css %}{% endblock %}
+    <!-- JavaScript -->
+    <script type=text/javascript src="{{ url_for('static', filename='jquery-ui-1.12.2.min.js') }}"></script>
+    {% block scripts %}{% endblock %}
   </head>
   <body>
     <div>
