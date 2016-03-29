@@ -177,16 +177,16 @@ def challenge_game(game_id):
     if request.method == "POST":
         # Increment question id
         if "next_question" in request.form:
-            session['question_id'] += 1
+            session['question'] += 1
             return redirect(url_for('challenge_game', game_id=game_id))
         # Decrement question id
         elif "previous_question" in request.form:
-            session['question_id'] -= 1
+            session['question'] -= 1
             return redirect(url_for('challenge_game', game_id=game_id))
         # If they are finished, remove session variables
         elif "finish" in request.form:
             session.pop('challenge_id', None)
-            session.pop('question_id', None)
+            session.pop('question', None)
             return redirect(url_for('games'))
     else:
         # If game is of incorrect mode, return to games page
@@ -196,16 +196,20 @@ def challenge_game(game_id):
 
         # Check that session variable corresponds to correct challenge game
         game_check = 'challenge_id' in session and game_id == session['challenge_id']
-        question = None
-        # Try to get question from session variable
-        if game_check and 'question_id' in session:
-            question = Question.query.join(Game).filter(
-                            Game.id == game_id).filter(
-                            Question.id == session['question_id']).first()
+        # If session variable for game is correct and session contains a question, try to get question
+        if game_check and 'question' in session:
+            # Try to get valid question
+            try:
+                question = Question.query.join(Game).filter(
+                            Game.id == game_id).order_by('id')[session['question']]
+            # Otherwise, get first question and reset session variable
+            except:
+                question = Question.query.join(Game).order_by('id').first()
+                session['question'] = 0
         # Otherwise, add variables to session and get first question
-        if not question:
-            question = Question.query.join(Game).first()
-            session['question_id'] = question.id
+        else:
+            question = Question.query.join(Game).order_by('id').first()
+            session['question'] = 0
             session['challenge_id'] = game_id
         
         # Determine minimum and maximum question id
@@ -218,6 +222,7 @@ def challenge_game(game_id):
                     question=question,
                     min_id=questions[0].id,
                     max_id=questions[-1].id)
+
 
 @app.route('/games/manage', methods=['GET', 'POST'])
 @login_required

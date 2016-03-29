@@ -138,6 +138,9 @@ class Question(db.Model):
             backref='question',
             lazy='dynamic')
 
+    def __repr__(self):
+        return self.question
+
 
 class Member(db.Model):
     ''' RFID membership card for patrons.'''
