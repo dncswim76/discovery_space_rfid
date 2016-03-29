@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/challenge.js') }}"></script>
+{% endblock scripts %}
+
+{% block content %}
+    <!-- Display game information.-->
+    <div>
+        <h1>{{ game.title }}</h1>
+        <h2>{{ game.description }}</h2>
+    </div>
+
+    <!-- Display question.-->
+    <div>
+        <h2>{{ question.question }}</h2>
+    </div>
+
+    <!-- Input box for RFID tag.-->
+    <p>Scan an object that answers the above question!</p>
+    <input name="game_id" type="hidden" value="{{ game.id }}" />
+    <input name="question_id" type="hidden" value="{{ question.id }}" />
+    <input name="tag" type="text" value="RFID Tag" />
+    <button type="button">Submit</button>
+
+    <!-- Forms to move to next question, previous question, or finish game.-->
+    <div>
+        <form action="" method="post" name="move">
+        {% if question.id != min_id %}
+            <input name="previous_question" type="submit" value="Previous Question" />
+        {% endif %}
+        {% if question.id != max_id %}
+            <input name="next_question" type="submit" value="Next Question" />
+        {% endif %}
+            <input name="finish" type="submit" value="Finish" />
+        </form>
+    </div>
+
+{% endblock %}

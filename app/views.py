@@ -8,12 +8,13 @@ from werkzeug import secure_filename
 
 from .forms import LoginForm
 from .models import Device, Game, game_device_link, GameMode, Question, question_answer_link, User
-from .utils import allowed_file
+from .utils import allowed_file, media_type
 
 
 @app.before_request
 def before_request():
     g.user = current_user
+
 
 @app.route('/')
 @app.route('/home')
@@ -44,6 +45,7 @@ def login():
         return redirect(next or url_for('home'))
     return render_template('login.html', form=form)
 
+
 @app.route('/logout')
 def logout():
     ''' User logout page.'''
@@ -68,20 +70,65 @@ def games():
     return render_template('games.html')
 
 
-@app.route('/_validate_tag')
-def validate_tag():
-    ''' JSON view function to check if scanned tag is valid.'''
+# AJAX
+@app.route('/_validate_learning_tag')
+def validate_learning_tag():
+    ''' JSON view to check if scanned RFID tag is valid
+        tag for learning mode game.'''
 
     # Get tag and game id from request
     tag = request.args.get('tag', 0, type=int)
     game_id = request.args.get('game_id', 0, type=int)
+
     # Check if RFID tag is associated with game
     device = Device.query.join(Game.devices).filter(
                     Game.id == game_id).filter(
                     Device.rfid_tag == tag).first()
 
-    # return data as JSON
-    return jsonify(device=device)
+    # If device exists, return JSON
+    if device:
+        return jsonify(valid=True,
+                       device__name=device.name,
+                       device__description=device.description,
+                       file_loc="/static/media" + device.file_loc,
+                       media=media_type(device.file_loc.split('.')[-1]))
+
+    # Otherwise, return None
+    else:
+        return jsonify(valid=False)
+
+
+#AJAX
+@app.route('/_validate_challenge_tag')
+def validate_challenge_tag():
+    ''' JSON view to check if scanned RFID tag answers question
+        to challenge mode game.'''
+
+    # Get tag, game id, and question_id from request
+    tag = request.args.get('tag', 0, type=int)
+    game_id = request.args.get('game_id', 0, type=int)
+    question_id = request.args.get('question_id', 0, type=int)
+
+    # Make sure question corresponds to game
+    if Question.query.get(question_id).game != game_id:
+        return jsonify(valid=False)
+
+    # Check if RFID tag answers question
+    device = Device.query.join(Question.answers).filter(
+                Question.id == question_id).filter(
+                Device.rfid_tag == tag).first()
+   
+    # If device exists, return JSON
+    if device:
+        return jsonify(valid=True,
+                       device__name=device.name,
+                       device__description=device.description,
+                       file_loc="/static/media" + device.file_loc,
+                       media=media_type(device.file_loc.split('.')[-1]))
+
+    # Otherwise, return None
+    else:
+        return jsonify(valid=False)
 
     
 @app.route('/games/learn')
@@ -119,18 +166,58 @@ def challenge():
     return render_template('challenge.html', games=games)
 
 
-@app.route('/games/challenge/<int:game_id>')
+@app.route('/games/challenge/<int:game_id>', methods=['GET', 'POST'])
 def challenge_game(game_id):
     ''' Format for challenge games.'''
 
     # Get game
-    game = Game.query.get(game_id)
-    # If game is of incorrect mode, return to games page
-    if GameMode.query.get(game.game_mode).mode != "challenge":
-        flash(u'%s is not a challenge mode game.' % game.title)
-        return redirect(url_for('games'))
-    
-    return render_template('challenge_game.html', game=game)
+    game = Game.query.get_or_404(game_id)
+
+    # POST moves to next or previous question
+    if request.method == "POST":
+        # Increment question id
+        if "next_question" in request.form:
+            session['question_id'] += 1
+            return redirect(url_for('challenge_game', game_id=game_id))
+        # Decrement question id
+        elif "previous_question" in request.form:
+            session['question_id'] -= 1
+            return redirect(url_for('challenge_game', game_id=game_id))
+        # If they are finished, remove session variables
+        elif "finish" in request.form:
+            session.pop('challenge_id', None)
+            session.pop('question_id', None)
+            return redirect(url_for('games'))
+    else:
+        # If game is of incorrect mode, return to games page
+        if GameMode.query.get(game.game_mode).mode != "challenge":
+            flash(u'%s is not a challenge mode game.' % game.title)
+            return redirect(url_for('games'))
+
+        # Check that session variable corresponds to correct challenge game
+        game_check = 'challenge_id' in session and game_id == session['challenge_id']
+        question = None
+        # Try to get question from session variable
+        if game_check and 'question_id' in session:
+            question = Question.query.join(Game).filter(
+                            Game.id == game_id).filter(
+                            Question.id == session['question_id']).first()
+        # Otherwise, add variables to session and get first question
+        if not question:
+            question = Question.query.join(Game).first()
+            session['question_id'] = question.id
+            session['challenge_id'] = game_id
+        
+        # Determine minimum and maximum question id
+        questions = Question.query.join(Game).filter(
+                            Game.id == game_id).order_by(Question.id)
+
+        # Pass game and question to template
+        return render_template('challenge_game.html',
+                    game=game,
+                    question=question,
+                    min_id=questions[0].id,
+                    max_id=questions[-1].id)
 
 @app.route('/games/manage', methods=['GET', 'POST'])
 @login_required
