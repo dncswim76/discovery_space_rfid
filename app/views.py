@@ -1,7 +1,7 @@
 import os
 from app import app, db, login_manager
 from datetime import datetime
-from flask import flash, g, redirect, render_template, request, session, url_for
+from flask import flash, g, jsonify, redirect, render_template, request, session, url_for
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from sqlalchemy import text
 from werkzeug import secure_filename
@@ -87,14 +87,14 @@ def validate_learning_tag():
 
     # If device exists, return JSON
     if device:
-        return jsonify(valid=True,
+        return jsonify(valid="true",
                        device__name=device.name,
                        device__description=device.description,
-                       file_loc="/static/media" + device.file_loc,
+                       file_loc="/static/media/" + device.file_loc,
                        media=media_type(device.file_loc.split('.')[-1]))
     # Otherwise, return None
     else:
-        return jsonify(valid=False)
+        return jsonify(valid="false")
 
 
 #AJAX

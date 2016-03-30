@@ -15,6 +15,11 @@
     <p>Scan object!</p>
     <input name="game_id" type="hidden" value="{{ game.id }}" />
     <input name="tag" type="text" value="RFID Tag" />
-    <button type="button">Submit</button>
+
+    <div id="learningModal" class="modalwindow">
+        <a href="#" class="close">X</a> <!-- Not Implemented -->
+        <div class="modal-content" id="learning-content">
+        </div>
+    </div>
 
 {% endblock %}
