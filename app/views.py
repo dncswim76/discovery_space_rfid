@@ -92,7 +92,6 @@ def validate_learning_tag():
                        device__description=device.description,
                        file_loc="/static/media" + device.file_loc,
                        media=media_type(device.file_loc.split('.')[-1]))
-
     # Otherwise, return None
     else:
         return jsonify(valid=False)
@@ -125,7 +124,6 @@ def validate_challenge_tag():
                        device__description=device.description,
                        file_loc="/static/media" + device.file_loc,
                        media=media_type(device.file_loc.split('.')[-1]))
-
     # Otherwise, return None
     else:
         return jsonify(valid=False)
@@ -416,3 +414,10 @@ def edit_game(game_id):
                     devices=devices,
                     questions=questions,
                     answers=answers)
+
+
+@app.route('/member/', methods=['GET', 'POST'])
+def member_check_in():
+    ''' Track member visits to Discovery Space.'''
+
+    pass
