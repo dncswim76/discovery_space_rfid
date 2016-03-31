@@ -1,4 +1,6 @@
 $(document).ready(function() {
+    $("#tag").focus();
+    window.scrollTo(0,0);
 	$(document).keypress(function(e) {
 		if(e.which === 13) {
 			$.getJSON($SCRIPT_ROOT + '/_validate_learning_tag', {
