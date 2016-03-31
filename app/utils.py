@@ -22,3 +22,5 @@ def media_type(extension):
         media = "audio"
     elif extension in ['mp4']:
         media = "video"
+
+    return media

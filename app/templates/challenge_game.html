@@ -21,7 +21,6 @@
     <input name="game_id" type="hidden" value="{{ game.id }}" />
     <input name="question_id" type="hidden" value="{{ question.id }}" />
     <input name="tag" type="text" value="RFID Tag" />
-    <button type="button">Submit</button>
 
     <!-- Forms to move to next question, previous question, or finish game.-->
     <div>
@@ -34,6 +33,13 @@
         {% endif %}
             <input name="finish" type="submit" value="Finish" />
         </form>
+    </div>
+
+    <!-- Modal display.-->
+    <div id="challengeModal" class="modalwindow">
+        <a href="#" class="close">X</a> <!-- Not Implemented -->
+        <div class="modal-content" id="challenge-content">
+        </div>
     </div>
 
 {% endblock %}

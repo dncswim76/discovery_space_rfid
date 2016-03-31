@@ -77,7 +77,7 @@ def validate_learning_tag():
         tag for learning mode game.'''
 
     # Get tag and game id from request
-    tag = request.args.get('tag', 0, type=int)
+    tag = request.args.get('tag', 0, type=str)
     game_id = request.args.get('game_id', 0, type=int)
 
     # Check if RFID tag is associated with game
@@ -104,13 +104,13 @@ def validate_challenge_tag():
         to challenge mode game.'''
 
     # Get tag, game id, and question_id from request
-    tag = request.args.get('tag', 0, type=int)
+    tag = request.args.get('tag', 0, type=str)
     game_id = request.args.get('game_id', 0, type=int)
     question_id = request.args.get('question_id', 0, type=int)
 
     # Make sure question corresponds to game
     if Question.query.get(question_id).game != game_id:
-        return jsonify(valid=False)
+        return jsonify(valid="false")
 
     # Check if RFID tag answers question
     device = Device.query.join(Question.answers).filter(
@@ -119,14 +119,14 @@ def validate_challenge_tag():
    
     # If device exists, return JSON
     if device:
-        return jsonify(valid=True,
+        return jsonify(valid="true",
                        device__name=device.name,
                        device__description=device.description,
-                       file_loc="/static/media" + device.file_loc,
+                       file_loc="/static/media/" + device.file_loc,
                        media=media_type(device.file_loc.split('.')[-1]))
     # Otherwise, return None
     else:
-        return jsonify(valid=False)
+        return jsonify(valid="false")
 
     
 @app.route('/games/learn')
