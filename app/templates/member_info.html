@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+    <div>
+        <p>{{ member.member_first_name }}</p>
+        <p>{{ member.member_last_name }}</p>
+        <p>{{ member.card_number }}</p>
+
+        <!-- Form for admins to delete member.-->
+        {% if session.authenticated %}
+            <form action="" method="post" name="delete_member">
+                <input name="member_id" type="hidden" value="{{ member.id }}" />
+                <td><input name="the_member" type="submit" value="Delete Member" /></td>
+            </form>
+        {% endif %}
+    </div> 
+{% endblock %}

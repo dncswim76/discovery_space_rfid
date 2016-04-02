@@ -7,7 +7,7 @@ from sqlalchemy import text
 from werkzeug import secure_filename
 
 from .forms import LoginForm
-from .models import Device, Game, game_device_link, GameMode, Question, question_answer_link, User
+from .models import Device, Game, game_device_link, GameMode, Member, MemberVisit, Question, question_answer_link, User
 from .utils import allowed_file, media_type
 
 
@@ -406,7 +406,7 @@ def edit_game(game_id):
             for question in questions:
                 answers.append(Device.query.join(Question.answers).filter(
                                     Question.id == question.id).all())
-        # render template with attributes
+        # Render template with attributes
         return render_template('edit_games.html',
                     game=game,
                     current_mode=current_mode,
@@ -416,8 +416,75 @@ def edit_game(game_id):
                     answers=answers)
 
 
-@app.route('/member/', methods=['GET', 'POST'])
-def member_check_in():
+@app.route('/members', methods=['GET', 'POST'])
+def members():
     ''' Track member visits to Discovery Space.'''
 
-    pass
+    if request.method == "POST":
+        # Check that tag belongs to active member
+        if "member_tag" in request.form:
+            member_tag = request.form.get('member_tag', type=str)
+            # Get member corresponding to tag or None
+            member = Member.query.filter(
+                        Member.card_number == member_tag).first()
+            # If active member, increment visits and redirect to member page
+            if member:
+                visit = MemberVisit(member=member.id, date=datetime.now())
+                # Commit visit
+                db.session.add(visit)
+                db.session.commit()
+                # Redirect home if an administrator is not logged in
+                if session['authenticated']:
+                    return redirect(url_for('member_info', member_id=member.id))
+                else:
+                    flash(u'Thank you for visiting!')
+                    return redirect(url_for('home'))
+            # Otherwise, report that tag does not belong to active member
+            else:
+                flash(u'Card does not correspond to active member. Select "Add \
+                    Member" to add a new member.')
+                return redirect(url_for('members'))
+        # Create new member
+        elif "new_member" in request.form:
+            member = Member(
+                        member_first_name="First Name",
+                        member_last_name="Last Name",
+                        card_number="Card Number")
+            db.session.add(member)
+            db.session.commit()
+            # redirect to new member's page
+            return redirect(url_for('member_info', member_id=member.id))
+    # Render template on GET request
+    else:
+        return render_template('members.html')
+
+
+@app.route('/members/<int:member_id>', methods=['GET', 'POST'])
+def member_info(member_id):
+    ''' View and edit member information.'''
+
+    # Get member
+    member = Member.query.get_or_404(member_id)
+
+    if request.method == "POST":
+        # Delete member
+        if "the_member" in request.form:
+            db.session.delete(member)
+            db.session.commit()
+            # Redirect to member page
+            return redirect(url_for('members'))
+    else:
+        return render_template('member_info.html',
+                    member=member)
+
+
+@app.route('/manage_members', methods=['GET', 'POST'])
+@login_required
+def manage_members():
+    ''' Admin interface for searching and editing members.'''
+
+    if request.method == "POST":
+        pass
+    else:
+        pass
+
