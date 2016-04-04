@@ -1,7 +1,7 @@
 from flask import Flask
 from flask.ext.login import LoginManager
 from flask.ext.migrate import Migrate, MigrateCommand
-from flask.ext.script import Manager
+from flask.ext.script import Manager, Server
 from flask.ext.sqlalchemy import SQLAlchemy
 
 
@@ -19,5 +19,6 @@ login_manager.init_app(app)
 # initialize manager
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
+manager.add_command('runserver', Server(threaded=True))
 
 from app import views, models
