@@ -20,11 +20,27 @@ $(document).ready(function() {
                     }
 					$('#challenge-content').html(html);
 					$('#challengeModal').css('display', 'inline');
+
+					sizeModalWindow();
 				} //end if
 				else
-					alert("Not quite! Try again!");
+					alert("Not quite. Try again!");
 			}); //end getJSON
 			return false;
 		}
 	});//end kepyress function
-});//end of function
+
+	$(".close").click(function(){
+		$('#challengeModal').css('display', 'none');
+	});//end click function for close button
+});//end of doc ready function
+
+$(window).resize(sizeModalWindow);
+
+function sizeModalWindow(){
+	var docW = $(document).width();
+	var docH = $(document).height();
+	$('#challengeModal').css('width', docW/2 + "px")
+		.css('right', docW/16 + "px")
+		.css('top', docH/4 + "px");
+};//end of sizeModalWindow function
