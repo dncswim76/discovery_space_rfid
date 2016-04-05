@@ -485,6 +485,7 @@ def manage_members():
 
     if request.method == "POST":
         pass
+    # GET request displays table of members and search feature
     else:
         pass
 

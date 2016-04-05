@@ -15,54 +15,61 @@ import pyautogui
 try:
     rfid = RFID()
 except RuntimeError as e:
-    print("Runtime Exception: %s" % e.details)
-    print("Exiting....")
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Runtime Exception: %s" % e.details)
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Exiting....")
     exit(1)
+
 
 #Information Display Function
 def displayDeviceInfo():
-    print("|------------|----------------------------------|--------------|------------|")
-    print("|- Attached -|-              Type              -|- Serial No. -|-  Version -|")
-    print("|------------|----------------------------------|--------------|------------|")
-    print("|- %8s -|- %30s -|- %10d -|- %8d -|" % (rfid.isAttached(), rfid.getDeviceName(), rfid.getSerialNum(), rfid.getDeviceVersion()))
-    print("|------------|----------------------------------|--------------|------------|")
-    print("Number of outputs: %i -- Antenna Status: %s -- Onboard LED Status: %s" % (rfid.getOutputCount(), rfid.getAntennaOn(), rfid.getLEDOn()))
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "|------------|----------------------------------|--------------|------------|")
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "|- Attached -|-              Type              -|- Serial No. -|-  Version -|")
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "|------------|----------------------------------|--------------|------------|")
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "|- %8s -|- %30s -|- %10d -|- %8d -|" % (rfid.isAttached(), rfid.getDeviceName(), rfid.getSerialNum(), rfid.getDeviceVersion()))
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "|------------|----------------------------------|--------------|------------|")
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Number of outputs: %i -- Antenna Status: %s -- Onboard LED Status: %s" % (rfid.getOutputCount(), rfid.getAntennaOn(), rfid.getLEDOn()))
+
 
 #Event Handler Callback Functions
 def rfidAttached(e):
     attached = e.device
-    print("RFID %i Attached!" % (attached.getSerialNum()))
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "RFID %i Attached!" % (attached.getSerialNum()))
+
+
 def rfidDetached(e):
     detached = e.device
-    print("RFID %i Detached!" % (detached.getSerialNum()))
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "RFID %i Detached!" % (detached.getSerialNum()))
 
 def rfidError(e):
     try:
         source = e.device
-        print("RFID %i: Phidget Error %i: %s" % (source.getSerialNum(), e.eCode, e.description))
+        rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "RFID %i: Phidget Error %i: %s" % (source.getSerialNum(), e.eCode, e.description))
     except PhidgetException as e:
-        print("Phidget Exception %i: %s" % (e.code, e.details))
+        rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Phidget Exception %i: %s" % (e.code, e.details))
+
 
 def rfidOutputChanged(e):
     source = e.device
-    print("RFID %i: Output %i State: %s" % (source.getSerialNum(), e.index, e.state))
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "RFID %i: Output %i State: %s" % (source.getSerialNum(), e.index, e.state))
+
 
 def rfidTagGained(e):
     source = e.device
     rfid.setLEDOn(1)
-    print("RFID %i: Tag Read: %s" % (source.getSerialNum(), e.tag))
-    pyautogui.typewrite('%s' % (str(e.tag)))	
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "RFID %i: Tag Read: %s" % (source.getSerialNum(), e.tag))
+    #Fake keyboard input as RFID tag
+    pyautogui.typewrite('%s' % (str(e.tag)))
+
 
 def rfidTagLost(e):
     source = e.device
     rfid.setLEDOn(0)
-    print("RFID %i: Tag Lost: %s" % (source.getSerialNum(), e.tag))
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "RFID %i: Tag Lost: %s" % (source.getSerialNum(), e.tag))
+
 
 #Main Program Code
 try:
-    #logging example, uncomment to generate a log file
-    #rfid.enableLogging(PhidgetLogLevel.PHIDGET_LOG_VERBOSE, "phidgetlog.log")
-
+    rfid.enableLogging(PhidgetLogLevel.PHIDGET_LOG_VERBOSE, "phidgetlog.log")
     rfid.setOnAttachHandler(rfidAttached)
     rfid.setOnDetachHandler(rfidDetached)
     rfid.setOnErrorhandler(rfidError)
@@ -70,57 +77,61 @@ try:
     rfid.setOnTagHandler(rfidTagGained)
     rfid.setOnTagLostHandler(rfidTagLost)
 except PhidgetException as e:
-    print("Phidget Exception %i: %s" % (e.code, e.details))
-    print("Exiting....")
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Phidget Exception %i: %s" % (e.code, e.details))
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Exiting....")
     exit(1)
 
-print("Opening phidget object....")
+rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Opening phidget object....")
 
 try:
     rfid.openPhidget()
 except PhidgetException as e:
-    print("Phidget Exception %i: %s" % (e.code, e.details))
-    print("Exiting....")
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Phidget Exception %i: %s" % (e.code, e.details))
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Exiting....")
     exit(1)
 
-print("Waiting for attach....")
+rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Waiting for attach....")
 
 try:
     rfid.waitForAttach(10000)
 except PhidgetException as e:
-    print("Phidget Exception %i: %s" % (e.code, e.details))
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Phidget Exception %i: %s" % (e.code, e.details))
     try:
         rfid.closePhidget()
     except PhidgetException as e:
-        print("Phidget Exception %i: %s" % (e.code, e.details))
-        print("Exiting....")
+        rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Phidget Exception %i: %s" % (e.code, e.details))
+        rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Exiting....")
         exit(1)
-    print("Exiting....")
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Exiting....")
     exit(1)
 else:
     displayDeviceInfo()
 
-print("Turning on the RFID antenna....")
+rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Turning on the RFID antenna....")
 rfid.setAntennaOn(True)
 
-print("Press Enter to quit....")
+#Loop indefinitely
+while True: pass
+
+'''
+rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Press Enter to quit....")
 
 chr = sys.stdin.read(1)
-
 try:
     lastTag = rfid.getLastTag()
-    print("Last Tag: %s" % (lastTag))
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Last Tag: %s" % (lastTag))
 except PhidgetException as e:
-    print("Phidget Exception %i: %s" % (e.code, e.details))
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Phidget Exception %i: %s" % (e.code, e.details))
 
-print("Closing...")
+rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Closing...")
 
 try:
     rfid.closePhidget()
 except PhidgetException as e:
-    print("Phidget Exception %i: %s" % (e.code, e.details))
-    print("Exiting....")
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Phidget Exception %i: %s" % (e.code, e.details))
+    rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Exiting....")
     exit(1)
 
-print("Done.")
+rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Done.")
 exit(0)
+'''

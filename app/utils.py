@@ -16,7 +16,7 @@ def allowed_file(filename):
 def media_type(extension):
     ''' Return type of media based on file extension.'''
 
-    if extension in ['png', 'jpg', 'jpeg', 'gif']:
+    if extension in ['png', 'jpg', 'JPG', 'jpeg', 'gif']:
         media = "image"
     elif extension in ['mp3']:
         media = "audio"

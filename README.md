@@ -6,6 +6,8 @@
 2. pip
 3. virtualenv
 4. virtualenvwrapper
+5. Phidgets Drivers and Python Libraries
+   `http://www.phidgets.com/docs/Software_Overview
 
 ## To get started:
 
