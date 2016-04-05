@@ -5,6 +5,7 @@ blinker==1.4
 decorator==4.0.9
 Flask==0.10.1
 Flask-Babel==0.9
+Flask-Fixtures==0.3.3
 Flask-Login==0.3.2
 Flask-Mail==0.9.1
 Flask-Migrate==1.8.0

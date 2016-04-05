@@ -1,0 +1,11 @@
+[
+    {
+        "model": "app.models.GameMode",
+        "records": [{
+            "mode": "learning"
+        },
+        {
+            "mode": "challenge"
+        }]
+    }
+]
