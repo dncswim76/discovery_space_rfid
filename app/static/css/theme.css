@@ -2,9 +2,10 @@ body    { font-family: sans-serif; background: #eee; }
 
 .modalwindow {
     position:fixed;
+    /*right: 0;*/
     display:none; /* Hides the modal window by default */
     z-index:9999;
-    width:500px;
+    /*width:500px;*/
     background: #FF5722;
     -webkit-box-shadow: 0 8px 6px -6px black;
     -moz-box-shadow: 0 8px 6px -6px black;
@@ -22,8 +23,8 @@ body    { font-family: sans-serif; background: #eee; }
 }
 .close {
     float: right;
-    margin-top: -47px;
-    margin-right: 15px;
+    /*margin-top: -47px;*/
+    /*margin-right: 15px;*/
     width: 17px;
     height: 17px;
     display: block;

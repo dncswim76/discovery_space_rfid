@@ -19,6 +19,8 @@ $(document).ready(function() {
                     }
 					$('#learning-content').html(html);
 					$('#learningModal').css('display', 'inline');
+
+					sizeModalWindow();
 				} //end if
 				else
 					alert("The object you scanned was not a part of this game. Try again!");
@@ -26,4 +28,18 @@ $(document).ready(function() {
 			return false;
 		}
 	});//end kepyress function
-});//end of function
+
+	$(".close").click(function(){
+		$('#learningModal').css('display', 'none');
+	});//end click function for close button
+});//end of doc ready function
+
+$(window).resize(sizeModalWindow);
+
+function sizeModalWindow(){
+	var docW = $(document).width();
+	var docH = $(document).height();
+	$('#learningModal').css('width', docW/2 + "px")
+		.css('right', docW/16 + "px")
+		.css('top', docH/4 + "px");
+};//end of sizeModalWindow function
