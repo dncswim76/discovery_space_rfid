@@ -33,8 +33,11 @@
 5. Install requirements:
    `$ pip install -r requirements/requirements.txt`
 
-6. Configure Database
+6. Configure Database:
    `$ python run.py db upgrade`
 
-7. Run locally in debug mode
-   `$ python run.py runserver -d`
+7. (Optional) For Phidget RFID to fake keyboard input:
+   `$ bash python_daemon.sh`
+
+8. Run server
+   `$ python run.py runserver`
