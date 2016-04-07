@@ -433,12 +433,8 @@ def members():
                 # Commit visit
                 db.session.add(visit)
                 db.session.commit()
-                # Redirect home if an administrator is not logged in
-                if session['authenticated']:
-                    return redirect(url_for('member_info', member_id=member.id))
-                else:
-                    flash(u'Thank you for visiting!')
-                    return redirect(url_for('home'))
+                flash(u'Thank you for visiting!')
+                return redirect(url_for('home'))
             # Otherwise, report that tag does not belong to active member
             else:
                 flash(u'Card does not correspond to active member. Select "Add \
@@ -446,14 +442,37 @@ def members():
                 return redirect(url_for('members'))
         # Create new member
         elif "new_member" in request.form:
+            # Get form data
+            first_name = request.form.get('first_name', type=str)
+            last_name = request.form.get('last_name', type=str)
+            card_number = request.form.get('card_number', type=str)
+
+            # Validate form data
+            if not first_name:
+                flash(u'You must enter a valid first name.')
+                return redirect(url_for('members'))
+            elif not last_name:
+                flash(u'You must enter a valid last name.')
+                return redirect(url_for('members'))
+            elif not card_number:
+                flash(u'You must scan a valid membership card.')
+                return redirect(url_for('members'))
+
+            # Create new member
             member = Member(
-                        member_first_name="First Name",
-                        member_last_name="Last Name",
-                        card_number="Card Number")
+                        member_first_name=first_name,
+                        member_last_name=last_name,
+                        card_number=card_number)
             db.session.add(member)
             db.session.commit()
-            # redirect to new member's page
-            return redirect(url_for('member_info', member_id=member.id))
+            # Mark first visit
+            visit = MemberVisit(member=member.id, date=datetime.now())
+            db.session.add(visit)
+            db.session.commit()
+
+            # Display success
+            flash(u'Successfully added %s %s as a member! Welcome!' % (first_name, last_name))
+            return redirect(url_for('members'))
     # Render template on GET request
     else:
         return render_template('members.html')
@@ -473,9 +492,43 @@ def member_info(member_id):
             db.session.commit()
             # Redirect to member page
             return redirect(url_for('members'))
+        elif "update_member" in request.form:
+            # Get form data
+            first_name = request.form.get('first_name', type=str)
+            last_name = request.form.get('last_name', type=str)
+            card_number = request.form.get('new_tag', type=str)
+
+            # Validate form data
+            if not first_name:
+                flash(u'You must enter a valid first name.')
+                return redirect(url_for('member_info', member_id=member_id))
+            elif not last_name:
+                flash(u'You must enter a valid last name.')
+                return redirect(url_for('member_info', member_id=member_id))
+            elif not card_number:
+                flash(u'You must scan a valid membership card.')
+                return redirect(url_for('member_info', member_id=member_id))
+
+            # Update member information
+            member.member_first_name = first_name
+            member.member_last_name = last_name
+            member.card_number = card_number
+            db.session.commit()
+            # Reload page
+            flash(u'Successfully updated member information.')
+            return redirect(url_for('member_info', member_id=member_id))
     else:
+        visits = MemberVisit.query.filter(
+                        MemberVisit.member == member.id).order_by(
+                        MemberVisit.date.desc())
+        # Get total number of visits and date of last visit
+        num_visits = visits.count()
+        last_visit = visits.first().date
+
         return render_template('member_info.html',
-                    member=member)
+                    member=member,
+                    num_visits=num_visits,
+                    last_visit=last_visit)
 
 
 @app.route('/manage_members', methods=['GET', 'POST'])
@@ -483,9 +536,43 @@ def member_info(member_id):
 def manage_members():
     ''' Admin interface for searching and editing members.'''
 
+    # Search for members
     if request.method == "POST":
-        pass
+        query = request.form.get('search_query', type=str)
+
+        # Make sure valid query is submitted
+        if not query or len(query) < 2:
+            flash(u'Search query must be longer than two characters.')
+            return redirect(url_for('manage_members'))
+
+        # Get members matching query
+        members = Member.query.filter(
+                    Member.member_last_name.ilike(query)).order_by(
+                    Member.member_last_name, Member.member_first_name)
+
+        # If no members match search query, reload page with message
+        if members.count() == 0:
+            flash(u'Your search query did not match any members. Try again.')
+            return redirect(url_for('manage_members'))
+
+        # Calculate visit information for each member
+        visit_info = []
+        for member in members:
+            visits = MemberVisit.query.filter(
+                            MemberVisit.member == member.id).order_by(
+                            MemberVisit.date.desc())
+            # Get total number of visits and date of last visit
+            num_visits = visits.count()
+            last_visit = visits.first().date
+            # append visit information to list
+            visit_info.append((num_visits, last_visit))
+
+        # Render template with list of members and their visit information
+        return render_template('member_search_results.html',
+                            members=members,
+                            visit_info=visit_info)
+
     # GET request displays table of members and search feature
     else:
-        pass
+        return render_template('manage_members.html')
 

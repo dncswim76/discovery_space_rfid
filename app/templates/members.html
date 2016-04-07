@@ -2,13 +2,17 @@
 {% block content %}
     <div>
         <h1>Discovery Space Membership</h1>
-        <p>Scan your membership card or click below to become a new member.<p>
+        <p>Scan your membership card or fill out the form below to become a new member.<p>
         <!-- Form to scan membership card.-->
         <form action="" method="post" name="scan_member">
             <input name="member_tag" type="text" />
         </form>
         <!-- Form to create new member.-->
+        <h2>New Member</h2>
         <form action="" method="post" name="add_member">
+            <p>First Name: <input name="first_name" type="text" /></p>
+            <p>Last Name: <input name="last_name" type="text" /></p>
+            <p>Card Number: <input name="card_number" type="text" /></p>
             <input name="new_member" type="submit" value="Add Member" />
         </form>
         <!-- Redirect for admins to manage members.-->

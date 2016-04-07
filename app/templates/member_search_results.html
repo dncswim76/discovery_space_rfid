@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+    <div>
+        <h1>Results</h1>
+        <!-- Table of results.-->
+        <table>
+            <tr>
+                <th></th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Card Number</th>
+                <th>Number of Visits</th>
+                <th>Last Visit</th>
+                <th>Edit Member</th>
+            </tr>
+            {% for member in members %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ member.member_first_name }}</td>
+                <td>{{ member.member_last_name }}</td>
+                <td>{{ member.card_number }}</td>
+                <td>{{ visit_info[loop.index0].0 }}</td>
+                <td>{{ visit_info[loop.index0].1.strftime('%m-%d-%Y %H:%M:%S') }}</td>
+                <td><a href="{{ url_for('member_info', member_id=member.id) }}">Edit</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        <!-- Button to return to search page.-->
+        <a class="button" href="{{ url_for('manage_members') }}">Back</a>
+    </div>
+{% endblock %}

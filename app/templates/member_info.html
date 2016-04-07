@@ -1,9 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
     <div>
-        <p>{{ member.member_first_name }}</p>
-        <p>{{ member.member_last_name }}</p>
-        <p>{{ member.card_number }}</p>
+        <h1>Member Information:</h1>
+        <h2>Number of Visits: {{ num_visits }}</h2>
+        <h2>Last Visit: {{ last_visit.strftime('%m-%d-%Y %H:%M:%S') }}</h2>
+        <!-- Form to change member information.-->
+        <form action="" method="post" name="add_member">
+            <p>First Name: <input name="first_name" type="text" value="{{ member.member_first_name }}" /></p>
+            <p>Last Name: <input name="last_name" type="text" value="{{ member.member_last_name }}" /></p>
+            <p>Card Number: <input name="new_tag" type="text" value="{{ member.card_number }}" /></p>
+            <input name="update_member" type="submit" value="Update" />
+        </form>
 
         <!-- Form for admins to delete member.-->
         {% if session.authenticated %}
