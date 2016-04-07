@@ -14,23 +14,24 @@
   </head>
   <body>
     <div id="header">
-            <div id="logo" onclick="location.href='/home'"></div>
-            {% if session.authenticated %}
-                <div id="logout" onclick="location.href={{ url_for('logout') }}"></div>
-            {% else %}
-                <div id="login" onclick="location.href={{ url_for('logout') }}"></div>
-            {% endif %}
+        <div id="logo" onclick="location.href='/home'"></div>
+        {% if session.authenticated %}
+            <div id="logout" onclick="location.href='/logout'">Logout</div>
+        {% else %}
+            <div id="login" onclick="location.href='/login'">Login</div>
+        {% endif %}
     </div>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul class=flashes>
-        {% for category, message in messages %}
-          <li class="{{ category }}">{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-    <hr>
-    {% block content %}{% endblock %}
+    <div id="content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class=flashes>
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
   </body>
 </html>
