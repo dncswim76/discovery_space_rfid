@@ -6,96 +6,99 @@
 
 {% block content %}
     <!-- Select Game Mode.-->
+    <div class="section_title">Edit Game</div>
+    <div class="section_title_divider"></div>
     <div class="section_content">
-    <h1>Edit Game</h1>
-    <form action="" method="post" id="edit_game_fields">
-        <b>Title: </b><input name="game_title" type="text" value="{{ game.title }}" /><br>
-        <b>Description: </b><input name="game_description" type="text" value="{{ game.description }}" /><br>
-        <b>Game Mode: </b>
-        <select name="mode">
-        <option></option>
-        {% for game_mode in game_modes %}
-            <option {% if current_mode.id == game_mode.id %}selected {% endif %}value="{{ game_mode.id }}">{{ game_mode.mode }}</option>
-        {% endfor %}
-        </select>
-        <br><input name="edit_game" type="submit" value="Submit" />
-    </form>
+        <br>
+        <form action="" method="post" id="edit_game_fields">
+            <b>Title: </b><input name="game_title" type="text" value="{{ game.title }}" /><br><br>
+            <b>Description: </b><input name="game_description" type="text" value="{{ game.description }}" /><br><br>
+            <b>Game Mode: </b>
+            <select name="mode">
+            <option></option>
+            {% for game_mode in game_modes %}
+                <option {% if current_mode.id == game_mode.id %}selected {% endif %}value="{{ game_mode.id }}">{{ game_mode.mode }}</option>
+            {% endfor %}
+            </select>
+            <br><br><input name="edit_game" type="submit" value="Submit" />
+        </form>
     </div>
 
     <!-- Display RFID tags with option to delete.-->
     <div class="section_content">
-    <h1>Add/Edit Devices</h1>
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Tag</th>
-            <th>Media</th>
-            <th>Delete?</th>
-        </tr>
-        {% for device in devices %}
-        <tr>
-            <td>{{ device.name }}</td>
-            <td>{{ device.description }}</td>
-            <td>{{ device.rfid_tag }}</td>
-            <td>{{ device.file_loc }}</td>
-            <form action="" method="post" name="delete_device">
-                <input name="device_id" type="hidden" value="{{ device.id }}" />
-                <td><input name="the_device" type="submit" value="Yes" /></td>
-            </form> 
-        </tr>
-        {% endfor %}
-    </table>
-    <!-- Option to add RFID object.-->
-    <form action="" method="post" name="add_device" enctype=multipart/form-data>
-        <input name="device_name" type="text" value="Name" />
-        <input name="device_description" type="text" value="Description" />
-        <input name="device_tag" type="text" value="RFID Tag" />
-        <input name="file" type="file">
-        <input name="add_rfid" type="submit" value="Add" />
-    </form>
+        <h3>Add/Edit Devices</h3>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Tag</th>
+                <th>Media</th>
+                <th>Delete?</th>
+            </tr>
+            {% for device in devices %}
+            <tr>
+                <td>{{ device.name }}</td>
+                <td>{{ device.description }}</td>
+                <td>{{ device.rfid_tag }}</td>
+                <td>{{ device.file_loc }}</td>
+                <form action="" method="post" name="delete_device">
+                    <input name="device_id" type="hidden" value="{{ device.id }}" />
+                    <td><input name="the_device" type="submit" value="Yes" /></td>
+                </form> 
+            </tr>
+            {% endfor %}
+        </table>
+        <br>
+        <!-- Option to add RFID object.-->
+        <form action="" method="post" name="add_device" enctype=multipart/form-data>
+            <input name="device_name" type="text" value="Name" />
+            <input name="device_description" type="text" value="Description" />
+            <input name="device_tag" type="text" value="RFID Tag" />
+            <input name="file" type="file">
+            <input name="add_rfid" type="submit" value="Add" />
+        </form>
     </div>
 
     {% if current_mode.mode == "challenge" %}
         <!-- Display Questions with option to delete.-->
         <div class="section_content">
-        <h1>Add/Edit Questions</h1>
-        <table>
-            <tr>
-                <th>Number</th>
-                <th>Question</th>
-                <th>Answers</th>
-                <th>Delete?</th>
-            </tr>
-            {% for question in questions %}
-            {% set q_count = loop.index0 %}
-            <tr>
-                <td>{{ q_count + 1 }}</td>
-                <td>{{ question.question }}</td>
-                <!-- Display answers to question.-->
-                <td><ol>
-                {% for answer in answers[q_count] %}
-                    <li>{{ answer.name }}</li>
+            <h4>Add/Edit Questions</h4>
+            <table>
+                <tr>
+                    <th>Number</th>
+                    <th>Question</th>
+                    <th>Answers</th>
+                    <th>Delete?</th>
+                </tr>
+                {% for question in questions %}
+                {% set q_count = loop.index0 %}
+                <tr>
+                    <td>{{ q_count + 1 }}</td>
+                    <td>{{ question.question }}</td>
+                    <!-- Display answers to question.-->
+                    <td><ol>
+                    {% for answer in answers[q_count] %}
+                        <li>{{ answer.name }}</li>
+                    {% endfor %}
+                    </ol></td>
+                    <form action="" method="post" name="delete_question">
+                        <input name="question_id" type="hidden" value="{{ question.id }}" />
+                        <td><input name="the_question" type="submit" value="Yes" /></td>
+                    </form> 
+                </tr>
                 {% endfor %}
-                </ol></td>
-                <form action="" method="post" name="delete_question">
-                    <input name="question_id" type="hidden" value="{{ question.id }}" />
-                    <td><input name="the_question" type="submit" value="Yes" /></td>
-                </form> 
-            </tr>
-            {% endfor %}
-        </table>
-        <!-- Option to add Question object.-->
-        <form action="" method="post" name="add_question">
-            <input name="question_text" type="text" value="Question Prompt" />
-            <!-- Select answers to Question.-->
-            <select multiple name="answers">
-            {% for device in devices %}
-                <option value="{{ device.id }}">{{ device.name }}</option>
-            {% endfor %}
-            </select>
-            <input name="add_question" type="submit" value="Add" />
-        </form>
+            </table>
+            <!-- Option to add Question object.-->
+            <form action="" method="post" name="add_question">
+                <input name="question_text" type="text" value="Question Prompt" />
+                <!-- Select answers to Question.-->
+                <select multiple name="answers">
+                {% for device in devices %}
+                    <option value="{{ device.id }}">{{ device.name }}</option>
+                {% endfor %}
+                </select>
+                <input name="add_question" type="submit" value="Add" />
+            </form>
         </div>
     {% endif %}
 {% endblock %}

@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-    <div>
-        <h1>Results</h1>
+    <div class="section_title">Results</div>
+    <div class="section_title_divider"></div>
+    <div class="section_content">
+        <br>
         <!-- Table of results.-->
         <table>
             <tr>
@@ -25,6 +27,7 @@
             </tr>
             {% endfor %}
         </table>
+        <br>
         <!-- Button to return to search page.-->
         <a class="button" href="{{ url_for('manage_members') }}">Back</a>
     </div>

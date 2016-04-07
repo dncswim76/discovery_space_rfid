@@ -6,24 +6,19 @@
 
 {% block content %}
     <!-- Display game information.-->
-    <div>
-        <h1>{{ game.title }}</h1>
-        <h2>{{ game.description }}</h2>
-    </div>
+    <div class="section_title">{{ game.title }}</div>
+    <div class="section_title_divider"></div>
+    <div class="section_content">
+        <h4>{{ game.description }}</h4>
+        <!-- Display question.-->
+        <h4>{{ question.question }}</h4>
 
-    <!-- Display question.-->
-    <div>
-        <h2>{{ question.question }}</h2>
-    </div>
-
-    <!-- Input box for RFID tag.-->
-    <p>Scan an object that answers the above question!</p>
-    <input name="game_id" type="hidden" value="{{ game.id }}" />
-    <input name="question_id" type="hidden" value="{{ question.id }}" />
-    <input id="tag" name="tag" type="text" />
-
-    <!-- Forms to move to next question, previous question, or finish game.-->
-    <div>
+        <!-- Input box for RFID tag.-->
+        <p>Scan an object that answers the above question!</p>
+        <input name="game_id" type="hidden" value="{{ game.id }}" />
+        <input name="question_id" type="hidden" value="{{ question.id }}" />
+        <input id="tag" name="tag" type="text" />
+        <br><br>
         <form action="" method="post" name="move">
         {% if question.id != min_id %}
             <input name="previous_question" type="submit" value="Previous Question" />

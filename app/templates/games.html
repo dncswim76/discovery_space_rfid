@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Games</h1>
-    <h2><a href="{{ url_for('learn') }}">Learning Mode</a></h2>
-    <h2><a href="{{ url_for('challenge') }}">Challenge Mode</a></h2>
-    {% if session.authenticated %}
-        <h2><a href="{{ url_for('manage_games') }}">Manage Games</a><h2>
-    {% endif %}
+    <div class="section_title">Games</div>
+    <div class="section_title_divider"></div>
+    <div class-"section_content">
+        <h3><a href="{{ url_for('learn') }}">Learning Games</a></h3>
+        <h3><a href="{{ url_for('challenge') }}">Challenge Games</a></h3>
+        {% if session.authenticated %}
+            <h3><a href="{{ url_for('manage_games') }}">Manage Games</a><h3>
+        {% endif %}
+    </div>
 {% endblock %}

@@ -1,20 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
-    <div>
-        <h1>Discovery Space Membership</h1>
-        <p>Scan your membership card or fill out the form below to become a new member.<p>
+    <div class="section_title">Discovery Space Membership</div>
+    <div class="section_title_divider"></div>
+    <div class="section_content">
+        <p>Scan your membership card or fill out the form below to become a new member!<p>
         <!-- Form to scan membership card.-->
         <form action="" method="post" name="scan_member">
             <input name="member_tag" type="text" />
         </form>
+        <div class="section_title_divider"></div>
         <!-- Form to create new member.-->
-        <h2>New Member</h2>
+        <h4>Add New Member:</h4>
         <form action="" method="post" name="add_member">
             <p>First Name: <input name="first_name" type="text" /></p>
             <p>Last Name: <input name="last_name" type="text" /></p>
             <p>Card Number: <input name="card_number" type="text" /></p>
             <input name="new_member" type="submit" value="Add Member" />
         </form>
+        <div class="section_title_divider"></div>
+        <br>
         <!-- Redirect for admins to manage members.-->
         {% if session.authenticated %}
             <a class="button" href="{{ url_for('manage_members') }}">Manage Members</a>

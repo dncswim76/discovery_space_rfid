@@ -1,49 +1,58 @@
 {% extends "base.html" %}
 {% block content %}
-    <!-- Option to create new Game.-->
-    <form action="" method="post" name="create_game">
-        <input name="create" type="submit" value="Create Game" />
-    </form>
-    <!-- Table to display learning games.-->
-    <h1>Learning Games</h1>
-    <table>
-        <tr>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Edit</th>
-            <th>Delete?</th>
-        </tr>
-        {% for game in learning_games %}
-        <tr>
-            <td>{{ game.title }}</td>
-            <td>{{ game.description }}</td>
-            <td><a href="{{ url_for('edit_game', game_id=game.id) }}">Edit</a></td>
-            <form action="" method="post" name="delete_game">
-                <input name="game_id" type="hidden" value="{{ game.id }}" />
-                <td><input name="the_game" type="submit" value="Yes" /></td>
-            </form>
-        </tr>
-        {% endfor %}
-    </table>
-    <!-- Table to display challenge games.-->
-    <h1>Challenge Games</h1>
-    <table>
-        <tr>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Edit</th>
-            <th>Delete</th>
-        </tr>
-        {% for game in challenge_games %}
-        <tr>
-            <td>{{ game.title }}</td>
-            <td>{{ game.description }}</td>
-            <td><a href="{{ url_for('edit_game', game_id=game.id) }}">Edit</a></td>
-            <form action="" method="post" name="delete_game">
-                <input name="game_id" type="hidden" value="{{ game.id }}" />
-                <td><input name="the_game" type="submit" value="Yes" /></td>
-            </form>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="section_title">Manage Games</div>
+    <div class="section_title_divider"></div>
+    <div class="section_content">
+        <h3>Create New Game: </h3>
+        <!-- Option to create new Game.-->
+        <form action="" method="post" name="create_game">
+            <input name="create" type="submit" value="Create Game" />
+        </form>
+        <!-- Table to display learning games.-->
+        <h3>Learning Games</h3>
+        <table>
+            <tr>
+                <th></th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Edit</th>
+                <th>Delete?</th>
+            </tr>
+            {% for game in learning_games %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ game.title }}</td>
+                <td>{{ game.description }}</td>
+                <td><a href="{{ url_for('edit_game', game_id=game.id) }}">Edit</a></td>
+                <form action="" method="post" name="delete_game">
+                    <input name="game_id" type="hidden" value="{{ game.id }}" />
+                    <td><input name="the_game" type="submit" value="Yes" /></td>
+                </form>
+            </tr>
+            {% endfor %}
+        </table>
+        <!-- Table to display challenge games.-->
+        <h3>Challenge Games</h3>
+        <table>
+            <tr>
+                <th></th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+            {% for game in challenge_games %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ game.title }}</td>
+                <td>{{ game.description }}</td>
+                <td><a href="{{ url_for('edit_game', game_id=game.id) }}">Edit</a></td>
+                <form action="" method="post" name="delete_game">
+                    <input name="game_id" type="hidden" value="{{ game.id }}" />
+                    <td><input name="the_game" type="submit" value="Yes" /></td>
+                </form>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 {% endblock %}

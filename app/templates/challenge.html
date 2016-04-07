@@ -1,18 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
-    <!-- Table to display challenge games.-->
-    <table>
-        <tr>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Play Now!</th>
-        </tr>
-        {% for game in games %}
-        <tr>
-            <td>{{ game.title }}</td>
-            <td>{{ game.description }}</td>
-            <td><a href="{{ url_for('challenge_game', game_id=game.id) }}">Play</a></td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="section_title">Challenge Games</div>
+    <div class="section_title_divider"></div>
+    <div class="section_content">
+        <!-- Table to display challenge games.-->
+        <table>
+            <tr>
+                <th></th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Play Now!</th>
+            </tr>
+            {% for game in games %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ game.title }}</td>
+                <td>{{ game.description }}</td>
+                <td><a href="{{ url_for('challenge_game', game_id=game.id) }}">Play</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 {% endblock %}

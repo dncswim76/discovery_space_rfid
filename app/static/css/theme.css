@@ -18,6 +18,16 @@ text-decoration:none;
 .section_title{
     margin-bottom:6px;
     font-family: DINMedium;
+    font-size:2em;
+    color:#666666;
+    text-shadow:1px 1px 0px #eeeeee;
+    text-transform: uppercase;
+    float: left;
+}
+
+.section_subtitle{
+    margin-bottom:4px;
+    font-family: DINMedium;
     font-size:1.5em;
     color:#666666;
     text-shadow:1px 1px 0px #eeeeee;
@@ -33,6 +43,14 @@ text-decoration:none;
     clear: left;
 }
 
+.section_subtitle_divider{
+    height:0.5px;
+    margin-bottom:4px;
+    background-color: #666666;
+    border-bottom:1px solid #eeeeee;
+    clear: left;
+}
+
 .section_content{ margin-bottom:10px; }
 
 /* Tables */
@@ -41,7 +59,7 @@ table {
     border-left:1px solid #dddddd;
     border-top:1px solid #dddddd;
 
-    text-align:left;
+    text-align:center;
     font-size:0.80em;
     color:#333;
     line-height:100%;
