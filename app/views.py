@@ -36,7 +36,7 @@ def login():
     form = LoginForm()
     # process form submission on POST
     if form.validate_on_submit():
-        flash(u'Successfully logged in as %s' % form.user.username)
+        flash(u'Successfully logged in as %s' % form.user.username, 'success')
         session['user_id'] = form.user.id
         session['authenticated'] = True
         # check if user has access to next url
@@ -54,7 +54,7 @@ def logout():
     # pop session variables
     session.pop('user_id', None)
     session.pop('authenticated', None)
-    flash(u'Successfully logged out.')
+    flash(u'Successfully logged out.', 'success')
     return redirect(url_for('home'))
 
 
@@ -148,7 +148,7 @@ def learning_game(game_id):
 
     # If game is of incorrect mode, return to games page
     if GameMode.query.get(game.game_mode).mode != "learning":
-        flash(u'%s is not a learning mode game.' % game.title)
+        flash(u'%s is not a learning mode game.' % game.title, 'error')
         return redirect(url_for('games'))
     
     return render_template('learning_game.html', game=game)
@@ -189,7 +189,7 @@ def challenge_game(game_id):
     else:
         # If game is of incorrect mode, return to games page
         if GameMode.query.get(game.game_mode).mode != "challenge":
-            flash(u'%s is not a challenge mode game.' % game.title)
+            flash(u'%s is not a challenge mode game.' % game.title, 'error')
             return redirect(url_for('games'))
 
         # Check that session variable corresponds to correct challenge game
@@ -238,7 +238,7 @@ def manage_games():
             db.session.delete(game)
             db.session.commit()
             # report that game was deleted and reload page
-            flash(u'Successfully deleted %s.' % title)
+            flash(u'Successfully deleted %s.' % title, 'success')
             return redirect(url_for('manage_games'))
         # if a game is to be created, make a new game and redirect to its page
         elif "create" in request.form:
@@ -278,18 +278,18 @@ def edit_game(game_id):
             title = request.form.get('game_title', type=str)
             if not title:
                 edit = False
-                flash(u'Invalid title.')
+                flash(u'Invalid title.', 'error')
             # Check if description needs to changed
             description = request.form.get('game_description', type=str)
             if not description:
                 edit = False
-                flash(u'Invalid description.')
+                flash(u'Invalid description.', 'error')
             # Check if game mode needs to be changed
             mode = request.form.get('mode', type=int)
             # if new mode is present in request, update game mode
             if not mode:
                 edit = False
-                flash(u'Invalid game mode selected.')
+                flash(u'Invalid game mode selected.', 'error')
             # if we can edit, apply changes
             if edit:
                 game.title = title
@@ -303,17 +303,17 @@ def edit_game(game_id):
             # Make sure a valid name is entered
             name = request.form.get('device_name', type=str)
             if not name:
-                flash(u'Invalid device name.')
+                flash(u'Invalid device name.', 'error')
                 return redirect(url_for('edit_game', game_id=game_id))
             # Make sure a valid description is entered
             description = request.form.get('device_description', type=str)
             if not description:
-                flash(u'Invalid device description.')
+                flash(u'Invalid device description.', 'error')
                 return redirect(url_for('edit_game', game_id=game_id))
             # Make sure valid RFID tag is entered
             tag = request.form.get('device_tag', type=str)
             if not tag:
-                flash(u'Invalid rfid tag.')
+                flash(u'Invalid rfid tag.', 'error')
                 return redirect(url_for('edit_game', game_id=game_id))
             # Get file to upload
             file = request.files['file']
@@ -322,7 +322,7 @@ def edit_game(game_id):
                 file_loc = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(file_loc)
             else:
-                flash(u'Invalid file.')
+                flash(u'Invalid file.', 'error')
                 return redirect(url_for('edit_game', game_id=game_id))
             # Now that everything is good, create Device and link it
             device = Device(name=name, description=description, rfid_tag=tag, file_loc=filename)
@@ -345,11 +345,11 @@ def edit_game(game_id):
             try:
                 os.remove(filename)
             except OSError:
-                flash(u'File %s does not exist.' % device.file_loc)
+                flash(u'File %s does not exist.' % device.file_loc, 'error')
             # Delete rfid
             db.session.delete(device)
             db.session.commit()
-            flash(u'Successfully deleted %s.' % device_name)
+            flash(u'Successfully deleted %s.' % device_name, 'success')
 
         # Handle adding new Question and associated answers
         elif "add_question" in request.form:
@@ -361,7 +361,7 @@ def edit_game(game_id):
             answers = request.form.getlist('answers')
             # Return an error if no answers are selected
             if not answers:
-                flash(u'Question must have at least one answer.')
+                flash(u'Question must have at least one answer.' 'error')
                 return redirect(url_for('edit_game', game_id=game_id))
             # Otherwise, create question and link answers
             else:
@@ -380,7 +380,7 @@ def edit_game(game_id):
             # Delete question
             db.session.delete(question)
             db.session.commit()
-            flash(u'Successfully deleted %s.' % question_name)
+            flash(u'Successfully deleted %s.' % question_name, 'success')
 
         # if we get here, render GET request
         return redirect(url_for('edit_game', game_id=game_id))
@@ -433,12 +433,12 @@ def members():
                 # Commit visit
                 db.session.add(visit)
                 db.session.commit()
-                flash(u'Thank you for visiting!')
+                flash(u'Thank you for visiting!', 'success')
                 return redirect(url_for('home'))
             # Otherwise, report that tag does not belong to active member
             else:
                 flash(u'Card does not correspond to active member. Select "Add \
-                    Member" to add a new member.')
+                    Member" to add a new member.', 'error')
                 return redirect(url_for('members'))
         # Create new member
         elif "new_member" in request.form:
@@ -449,13 +449,13 @@ def members():
 
             # Validate form data
             if not first_name:
-                flash(u'You must enter a valid first name.')
+                flash(u'You must enter a valid first name.', 'error')
                 return redirect(url_for('members'))
             elif not last_name:
-                flash(u'You must enter a valid last name.')
+                flash(u'You must enter a valid last name.', 'error')
                 return redirect(url_for('members'))
             elif not card_number:
-                flash(u'You must scan a valid membership card.')
+                flash(u'You must scan a valid membership card.', 'error')
                 return redirect(url_for('members'))
 
             # Create new member
@@ -471,7 +471,7 @@ def members():
             db.session.commit()
 
             # Display success
-            flash(u'Successfully added %s %s as a member! Welcome!' % (first_name, last_name))
+            flash(u'Successfully added %s %s as a member! Welcome!' % (first_name, last_name), 'success')
             return redirect(url_for('members'))
     # Render template on GET request
     else:
@@ -500,13 +500,13 @@ def member_info(member_id):
 
             # Validate form data
             if not first_name:
-                flash(u'You must enter a valid first name.')
+                flash(u'You must enter a valid first name.', 'error')
                 return redirect(url_for('member_info', member_id=member_id))
             elif not last_name:
-                flash(u'You must enter a valid last name.')
+                flash(u'You must enter a valid last name.', 'error')
                 return redirect(url_for('member_info', member_id=member_id))
             elif not card_number:
-                flash(u'You must scan a valid membership card.')
+                flash(u'You must scan a valid membership card.', 'error')
                 return redirect(url_for('member_info', member_id=member_id))
 
             # Update member information
@@ -515,7 +515,7 @@ def member_info(member_id):
             member.card_number = card_number
             db.session.commit()
             # Reload page
-            flash(u'Successfully updated member information.')
+            flash(u'Successfully updated member information.', 'success')
             return redirect(url_for('member_info', member_id=member_id))
     else:
         visits = MemberVisit.query.filter(
@@ -542,7 +542,7 @@ def manage_members():
 
         # Make sure valid query is submitted
         if not query or len(query) < 2:
-            flash(u'Search query must be longer than two characters.')
+            flash(u'Search query must be longer than two characters.', 'error')
             return redirect(url_for('manage_members'))
 
         # Get members matching query
@@ -552,7 +552,7 @@ def manage_members():
 
         # If no members match search query, reload page with message
         if members.count() == 0:
-            flash(u'Your search query did not match any members. Try again.')
+            flash(u'Your search query did not match any members. Try again.', 'error')
             return redirect(url_for('manage_members'))
 
         # Calculate visit information for each member

@@ -80,8 +80,14 @@ table th {
     background-color:#797979;
 }
 
-/* Button */
+/* Lists */
+ul {
+   list-style: none;
+   margin: 0;
+   padding: 0;
+}
 
+/* Button */
 .button a, input[type=submit], input[type=button]{
     padding:3px 24px;
 
@@ -161,7 +167,7 @@ input.text:hover, textarea:hover {
 /* Images */
 img {
     display: block;
-    margin-left: auto;
+    margin-left: 0;
     margin-right: auto;
     max-width: 100%;
     max-height: 100%;
@@ -202,4 +208,30 @@ img {
     text-decoration: none;
     font-weight: bold;
     font-family: arial;
+}
+
+/* Messages */
+.info, .error, .success{
+    width:650px;
+    margin-bottom:10px;
+    padding:10px 35px;
+    font-size:0.80em;
+}
+
+.info {
+    background:url(../images/icons/info-trans.png) 12px 12px no-repeat;
+    color:#676400;
+    background-color:rgba(239,236,152,0.75);
+}
+
+.error {
+    background:url(../images/icons/error-trans.png) 12px 12px no-repeat;
+    color:#670000;
+    background-color:rgba(239,152,152,0.75);
+}
+
+.success {
+    background:url(../images/icons/success-trans.png) 12px 12px no-repeat;
+    color:#006707;
+    background-color:rgba(152,239,152,0.75);
 }

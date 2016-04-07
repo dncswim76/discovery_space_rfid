@@ -13,26 +13,24 @@
     {% block scripts %}{% endblock %}
   </head>
   <body>
-    <div>
-    <a href="/home">Home</a>
-    {% if session.authenticated %}
-        <a href="/logout">Logout</a>
-    {% else %}
-        <a href="/login">Login</a>
-    {% endif %}
-    <a href="/games">Games</a>
-    <a href="/members">Members</a>
+    <div id="header">
+            <div id="logo" onclick="location.href='/home'"></div>
+            {% if session.authenticated %}
+                <div id="logout" onclick="location.href={{ url_for('logout') }}"></div>
+            {% else %}
+                <div id="login" onclick="location.href={{ url_for('logout') }}"></div>
+            {% endif %}
     </div>
-    <hr>
-    {% with messages = get_flashed_messages() %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
-        <ul>
-        {% for message in messages %}
-          <li>{{ message }}</li>
+        <ul class=flashes>
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
         {% endfor %}
         </ul>
       {% endif %}
     {% endwith %}
+    <hr>
     {% block content %}{% endblock %}
   </body>
 </html>
