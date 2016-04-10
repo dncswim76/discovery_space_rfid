@@ -58,7 +58,7 @@ def rfidTagGained(e):
     rfid.setLEDOn(1)
     rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "RFID %i: Tag Read: %s" % (source.getSerialNum(), e.tag))
     #Fake keyboard input as RFID tag
-    pyautogui.typewrite('%s' % (str(e.tag)))
+    pyautogui.typewrite('%s\r' % (str(e.tag)))
 
 
 def rfidTagLost(e):

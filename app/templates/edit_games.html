@@ -53,8 +53,8 @@
         <form action="" method="post" name="add_device" enctype=multipart/form-data>
             <input name="device_name" type="text" value="Name" />
             <input name="device_description" type="text" value="Description" />
-            <input name="device_tag" type="text" value="RFID Tag" />
             <input name="file" type="file">
+            <input name="device_tag" type="text" value="RFID Tag" />
             <input name="add_rfid" type="submit" value="Add" />
         </form>
     </div>
@@ -92,7 +92,7 @@
             <form action="" method="post" name="add_question">
                 <input name="question_text" type="text" value="Question Prompt" />
                 <!-- Select answers to Question.-->
-                <select multiple name="answers">
+                <select multiple name="answers" size=3>
                 {% for device in devices %}
                     <option value="{{ device.id }}">{{ device.name }}</option>
                 {% endfor %}

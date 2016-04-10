@@ -1,4 +1,14 @@
 {% extends "base.html" %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#search").focus();
+            window.scrollTo(0,0);
+        });
+    </script>
+{% endblock scripts %}
+
 {% block content %}
     <div class="section_title">Member Search</div>
     <div class="section_title_divider"></div>
@@ -6,7 +16,7 @@
         <!-- Form to search for members.-->
         <p>Search for members by last name.</p>
         <form action="" method="post" name="search_members">
-            <input name="search_query" type="text" />
+            <input id="search" name="search_query" type="text" />
         </form>
     </div>
 {% endblock %}

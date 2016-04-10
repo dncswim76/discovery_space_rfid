@@ -25,6 +25,7 @@ $(document).ready(function() {
 				} //end if
 				else
 					alert("Not quite. Try again!");
+                    $('#tag').val('');
 			}); //end getJSON
 			return false;
 		}
@@ -32,6 +33,7 @@ $(document).ready(function() {
 
 	$(".close").click(function(){
 		$('#challengeModal').css('display', 'none');
+        $("#tag").focus();
 	});//end click function for close button
 });//end of doc ready function
 

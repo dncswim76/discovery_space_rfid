@@ -24,6 +24,7 @@ $(document).ready(function() {
 				} //end if
 				else
 					alert("The object you scanned was not a part of this game. Try again!");
+                    $('#tag').val('');
 			}); //end getJSON
 			return false;
 		}
@@ -31,6 +32,7 @@ $(document).ready(function() {
 
 	$(".close").click(function(){
 		$('#learningModal').css('display', 'none');
+        $("#tag").focus();
 	});//end click function for close button
 });//end of doc ready function
 

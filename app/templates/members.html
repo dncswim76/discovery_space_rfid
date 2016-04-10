@@ -1,4 +1,15 @@
 {% extends "base.html" %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#tag").focus();
+            window.scrollTo(0,0);
+        });
+    </script>
+{% endblock scripts %}
+
+
 {% block content %}
     <div class="section_title">Discovery Space Membership</div>
     <div class="section_title_divider"></div>
@@ -6,7 +17,7 @@
         <p>Scan your membership card or fill out the form below to become a new member!<p>
         <!-- Form to scan membership card.-->
         <form action="" method="post" name="scan_member">
-            <input name="member_tag" type="text" />
+            <input name="member_tag" id="tag" type="text" />
         </form>
         <div class="section_title_divider"></div>
         <!-- Form to create new member.-->
