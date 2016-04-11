@@ -271,6 +271,18 @@ img {
     font-family: arial;
 }
 
+.shade{
+    display:none;
+    position:fixed;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    background-color:#000;
+    opacity:0.8;
+    z-index:9998;
+}
+
 /* Messages */
 .info, .error, .success{
     width:650px;
