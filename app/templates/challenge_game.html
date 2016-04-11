@@ -9,7 +9,7 @@
     <div class="section_title">{{ game.title }}</div>
     <div class="section_title_divider"></div>
     <div class="section_content">
-        <h4>{{ game.description }}</h4>
+        <h3>{{ game.description }}</h3>
         <!-- Display question.-->
         <h4>{{ question.question }}</h4>
 
@@ -28,6 +28,8 @@
         {% endif %}
             <input name="finish" type="submit" value="Finish" />
         </form>
+
+        <p id="back"><a href="{{ url_for('games') }}">Back to Games</a></p><br>
     </div>
 
     <!-- Modal display.-->

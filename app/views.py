@@ -63,13 +63,6 @@ def load_user(user_id):
     return User.query.get(user_id)
 
 
-@app.route('/games')
-def games():
-    ''' Choose game mode or edit games if admin.'''
-    
-    return render_template('games.html')
-
-
 # AJAX
 @app.route('/_validate_learning_tag')
 def validate_learning_tag():
@@ -129,16 +122,6 @@ def validate_challenge_tag():
         return jsonify(valid="false")
 
     
-@app.route('/games/learn')
-def learn():
-    ''' Listing of learning games.'''
-
-    # Get list of all games of type learning
-    games = Game.query.join(GameMode).filter(
-                GameMode.mode == "learning").order_by('title')
-    return render_template('learning.html', games=games)
-
-
 @app.route('/games/learn/<int:game_id>')
 def learning_game(game_id):
     ''' Format for learning games.'''
@@ -152,16 +135,6 @@ def learning_game(game_id):
         return redirect(url_for('games'))
     
     return render_template('learning_game.html', game=game)
-
-
-@app.route('/games/challenge')
-def challenge():
-    ''' Listing of challenge games.'''
-
-    # Get list of all games of type challenge
-    games = Game.query.join(GameMode).filter(
-                GameMode.mode == "challenge").order_by('title')
-    return render_template('challenge.html', games=games)
 
 
 @app.route('/games/challenge/<int:game_id>', methods=['GET', 'POST'])
@@ -222,10 +195,9 @@ def challenge_game(game_id):
                     max_id=questions[-1].id)
 
 
-@app.route('/games/manage', methods=['GET', 'POST'])
-@login_required
-def manage_games():
-    ''' Links for admins to create, edit or delete games.'''
+@app.route('/games', methods=['GET', 'POST'])
+def games():
+    ''' List of games. Admins can edit or delete games.'''
     
     # if POST request, handle changes
     if request.method == "POST":
@@ -239,7 +211,7 @@ def manage_games():
             db.session.commit()
             # report that game was deleted and reload page
             flash(u'Successfully deleted %s.' % title, 'success')
-            return redirect(url_for('manage_games'))
+            return redirect(url_for('games'))
         # if a game is to be created, make a new game and redirect to its page
         elif "create" in request.form:
             # default to first game mode
@@ -256,7 +228,7 @@ def manage_games():
                 GameMode.mode == "learning").order_by('title')
         challenge_games = Game.query.join(GameMode).filter(
                 GameMode.mode == "challenge").order_by('title')
-        return render_template('manage_games.html',
+        return render_template('games.html',
                 learning_games=learning_games,
                 challenge_games=challenge_games)
 
