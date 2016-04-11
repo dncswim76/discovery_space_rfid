@@ -21,6 +21,9 @@ $(document).ready(function() {
 					$('#challenge-content').html(html);
 					$('#challengeModal').css('display', 'inline');
 
+                    $('.shade').css('display', 'inline');
+                    $('#tag').prop('disabled',true);
+
 					sizeModalWindow();
 				} //end if
 				else
@@ -32,17 +35,22 @@ $(document).ready(function() {
 	});//end kepyress function
 
 	$(".close").click(function(){
-		$('#challengeModal').css('display', 'none');
-        $("#tag").focus();
+        $('#challengeModal').css('display', 'none');
+        $('.shade').css('display', 'none');
+        $("#tag").prop('disabled',false).focus();
 	});//end click function for close button
 });//end of doc ready function
 
 $(window).resize(sizeModalWindow);
 
 function sizeModalWindow(){
-	var docW = $(document).width();
-	var docH = $(document).height();
-	$('#challengeModal').css('width', docW/2 + "px")
-		.css('right', docW/16 + "px")
-		.css('top', docH/4 + "px");
+    var docW = $(document).width();
+    var docH = $(document).height();
+
+    var mod = $('#challengeModal');
+
+    mod .css('width', 2*docW/3 + "px")
+        .css('height', 2*docH/3 + "px")
+        .css('left', ((docW/2)-(mod.width()/2)) + "px")
+        .css('top', ((docH/2)-(mod.height()/2)) + "px");
 };//end of sizeModalWindow function
