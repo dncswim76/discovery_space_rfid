@@ -53,10 +53,10 @@
             <tr>
                 <td></td>
                 <form action="" method="post" name="add_device" enctype=multipart/form-data>
-                    <td><input name="device_name" type="text" value="Name" /></td>
-                    <td><input name="device_description" type="text" value="Description" /></td>
+                    <td><input id="add_name" name="device_name" type="text" /></td>
+                    <td><input name="device_description" type="text" /></td>
                     <td><input name="file" type="file"></td>
-                    <td><input name="device_tag" type="text" value="RFID Tag" /></td>
+                    <td><input name="device_tag" type="text" /></td>
                     <td><input name="add_rfid" type="submit" value="Add" /></td>
                 </form>
             </tr>
@@ -95,7 +95,7 @@
                 <tr>
                     <td></td>
                     <form action="" method="post" name="add_question">
-                        <td><input name="question_text" type="text" value="Question Prompt" /></td>
+                        <td><input name="question_text" type="text" /></td>
                         <!-- Select answers to Question.-->
                         <td><select multiple name="answers" size=3>
                         {% for device in devices %}
