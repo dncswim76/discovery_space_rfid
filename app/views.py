@@ -206,7 +206,28 @@ def games():
             game_id = request.form.get('game_id', type=int)
             game = Game.query.get(game_id)
             title = game.title
-            # delete associated game
+            # Delete all devices associated with game
+            devices = Device.query.join(Game.devices).filter(Game.id == game_id)
+            for device in devices:
+                # Check if file is used by another device
+                if Device.query.filter(Device.file_loc == device.file_loc).count() == 1:
+                    # Get file location to delete
+                    filename = os.path.join(app.config['UPLOAD_FOLDER'], device.file_loc)
+                    # Try to delete file
+                    try:
+                        os.remove(filename)
+                    except OSError:
+                        flash(u'File %s does not exist.' % device.file_loc, 'error')
+                # Delete rfid
+                db.session.delete(device)
+            db.session.commit()
+
+            # Delete all questions associated with game
+            questions = Question.query.filter(Question.game == game_id)
+            for question in questions:
+                db.session.delete(question)
+            db.session.commit()
+            # Delete associated game
             db.session.delete(game)
             db.session.commit()
             # report that game was deleted and reload page
@@ -311,13 +332,15 @@ def edit_game(game_id):
             device_id = request.form.get('device_id', type=int)
             device = Device.query.get(device_id)
             device_name = device.name
-            # get file location to delete
-            filename = os.path.join(app.config['UPLOAD_FOLDER'], device.file_loc)
-            # try to delete file
-            try:
-                os.remove(filename)
-            except OSError:
-                flash(u'File %s does not exist.' % device.file_loc, 'error')
+            # Check if file is used by other devices
+            if Device.query.filter(Device.file_loc == device.file_loc).count() == 1:
+                # Get file location to delete
+                filename = os.path.join(app.config['UPLOAD_FOLDER'], device.file_loc)
+                # Try to delete file
+                try:
+                    os.remove(filename)
+                except OSError:
+                    flash(u'File %s does not exist.' % device.file_loc, 'error')
             # Delete rfid
             db.session.delete(device)
             db.session.commit()

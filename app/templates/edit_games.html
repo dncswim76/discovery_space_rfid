@@ -22,10 +22,9 @@
             </select>
             <br><br><input name="edit_game" type="submit" value="Submit" />
         </form>
-    </div>
+        <p id="back"><a href="{{ url_for('games') }}">Back to Games</a></p>
 
-    <!-- Display RFID tags with option to delete.-->
-    <div class="section_content">
+        <!-- Display RFID tags with option to delete.-->
         <h3>Add/Edit Devices</h3>
         <table>
             <tr>
@@ -61,11 +60,9 @@
                 </form>
             </tr>
         </table>
-    </div>
 
-    {% if current_mode.mode == "challenge" %}
+        {% if current_mode.mode == "challenge" %}
         <!-- Display Questions with option to delete.-->
-        <div class="section_content">
             <h4>Add/Edit Questions</h4>
             <table>
                 <tr>
@@ -106,6 +103,6 @@
                     </form>
                 </tr>
             </table>
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
 {% endblock %}
