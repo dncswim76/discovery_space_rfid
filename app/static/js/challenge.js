@@ -12,7 +12,7 @@ $(document).ready(function() {
 					var html = '<h1>Correct! You scanned: <b>' + data.device__name + '</b></h1>';
                     html += '<h2>' + data.device__description + '</h2>';
                     if(data.media === "image") {
-                        html += '<img src="' + data.file_loc + '"></img>';
+                        html += '<img src="' + data.file_loc + '" id="myImg"></img>';
                     } else if(data.media === "audio") {
                         html += '<audio controls><source src="' + data.file_loc + '" type="audio/mpeg"></audio>'
                     } else if(data.media === "video") {
@@ -53,4 +53,8 @@ function sizeModalWindow(){
         .css('height', 2*docH/3 + "px")
         .css('left', ((docW/2)-(mod.width()/2)) + "px")
         .css('top', ((docH/2)-(mod.height()/2)) + "px");
+
+    //fix the image height, if there is an image
+    var imgTop = $('#myImg').position().top;
+    $('#myImg').css('max-height', ((mod.height()-imgTop)-10) + "px");
 };//end of sizeModalWindow function
