@@ -9,7 +9,7 @@ $(document).ready(function() {
                 question_id: $('input[name="question_id"]').val()
 			}, function(data) {
 				if(data.valid === "true") {
-					var html = '<h1>Correct! You scanned: <b>' + data.device__name + '</b></h1>';
+					var html = '<h1>Correct! You scanned: <b><font color=blue>' + data.device__name + '</font></b></h1>';
                     html += '<h2>' + data.device__description + '</h2>';
                     if(data.media === "image") {
                         html += '<img src="' + data.file_loc + '" id="myImg"></img>';
@@ -25,6 +25,8 @@ $(document).ready(function() {
                     $('#tag').prop('disabled',true);
 
 					sizeModalWindow();
+                    //Text-to-Speech for description
+                    responsiveVoice.speak(data.device__description, "US English Male");
 				} //end if
 				else
 					alert("Not quite. Try again!");
