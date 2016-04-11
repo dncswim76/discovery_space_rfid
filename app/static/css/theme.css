@@ -232,6 +232,15 @@ input.text:hover, textarea:hover {
     border: 1px solid #bbbbbb;
 }
 
+/* Size for description fields */
+#edit_description{
+    width:500px;
+}
+
+#description{
+    width:100%;
+}
+
 /* Images */
 img {
     display: block;

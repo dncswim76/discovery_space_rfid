@@ -12,7 +12,7 @@
         <br>
         <form action="" method="post" id="edit_game_fields">
             <b>Title: </b><input name="game_title" type="text" value="{{ game.title }}" /><br><br>
-            <b>Description: </b><input name="game_description" type="text" value="{{ game.description }}" /><br><br>
+            <b>Description: </b><input id="edit_description" name="game_description" type="textarea" value="{{ game.description }}" /><br><br>
             <b>Game Mode: </b>
             <select name="mode">
             <option></option>
@@ -54,7 +54,7 @@
                 <td></td>
                 <form action="" method="post" name="add_device" enctype=multipart/form-data>
                     <td><input id="add_name" name="device_name" type="text" /></td>
-                    <td><input name="device_description" type="text" /></td>
+                    <td><input id="description" name="device_description" type="text" /></td>
                     <td><input name="file" type="file"></td>
                     <td><input name="device_tag" type="text" /></td>
                     <td><input name="add_rfid" type="submit" value="Add" /></td>
@@ -95,9 +95,9 @@
                 <tr>
                     <td></td>
                     <form action="" method="post" name="add_question">
-                        <td><input name="question_text" type="text" /></td>
+                        <td><input id="description" name="question_text" type="text" /></td>
                         <!-- Select answers to Question.-->
-                        <td><select multiple name="answers" size=3>
+                        <td><select multiple name="answers" size=5>
                         {% for device in devices %}
                             <option value="{{ device.id }}">{{ device.name }}</option>
                         {% endfor %}
