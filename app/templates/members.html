@@ -33,6 +33,7 @@
         <!-- Redirect for admins to manage members.-->
         {% if session.authenticated %}
             <a class="button" href="{{ url_for('manage_members') }}">Manage Members</a>
+            <a class="button" href="{{ url_for('member_metrics') }}">Membership Reports</a>
         {% endif %}
     </div> 
 {% endblock %}

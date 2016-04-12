@@ -481,10 +481,19 @@ def member_info(member_id):
     member = Member.query.get_or_404(member_id)
 
     if request.method == "POST":
-        # Delete member
+        # Delete member and member visits
         if "the_member" in request.form:
+            first_name = member.member_first_name
+            last_name = member.member_last_name
+            # Delete all member visits
+            visits = MemberVisit.query.filter(MemberVisit.member == member.id)
+            for visit in visits:
+                db.session.delete(visit)
+            db.session.commit()
+            # Delete member
             db.session.delete(member)
             db.session.commit()
+            flash(u'Successfully deleted %s %s.' % (first_name, last_name), 'success')
             # Redirect to member page
             return redirect(url_for('members'))
         elif "update_member" in request.form:
@@ -542,7 +551,7 @@ def manage_members():
 
         # Get members matching query
         members = Member.query.filter(
-                    Member.member_last_name.ilike(query)).order_by(
+                    Member.member_last_name.ilike("%" + query + "%")).order_by(
                     Member.member_last_name, Member.member_first_name)
 
         # If no members match search query, reload page with message
@@ -571,3 +580,15 @@ def manage_members():
     else:
         return render_template('manage_members.html')
 
+
+@app.route('/members/metrics', methods=['GET', 'POST'])
+@login_required
+def member_metrics():
+    ''' Admin interface for viewing and running membership reports.'''
+
+    # POST request runs specified report
+    if request.method == "POST":
+        pass
+    # GET request renders template
+    else:
+        return render_template('member_metrics.html')
