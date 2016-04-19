@@ -10,6 +10,7 @@ from Phidgets.Devices.RFID import RFID, RFIDTagProtocol
 from Phidgets.Phidget import PhidgetLogLevel
 
 import pyautogui
+import time
 
 #Create an RFID object
 try:
@@ -110,8 +111,9 @@ else:
 rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Turning on the RFID antenna....")
 rfid.setAntennaOn(True)
 
-#Loop indefinitely
-while True: pass
+#Loop indefinitely - sleep has low overhead
+while True:
+    time.sleep(sys.maxint)
 
 '''
 rfid.log(PhidgetLogLevel.PHIDGET_LOG_INFO, None, "Press Enter to quit....")
