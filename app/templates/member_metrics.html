@@ -1,9 +1,37 @@
 {% extends "base.html" %}
 
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/member_metrics.js') }}"></script>
+{% endblock scripts %}
+
 {% block content %}
     <div class="section_title">Membership Metrics</div>
     <div class="section_title_divider"></div>
     <div class="section_content">
-        <p>Choose report to run.</p>
+        <p><b>Select date range for which to report the following metrics.</b></p>
+        <p> 
+        <form action="" method="post" name="submit_date">
+            Start Date: <input name="start_date" type="text" id="datepicker_start">
+            End Date: <input name="end_date" type="text" id="datepicker_end">
+            <input name="run" type="submit" value="Run" />
+        </form>
+        </p>
+        <!-- Table to report metrics.-->
+        <table>
+            <tr>
+                <th>Date Range</th>
+                <th>Total Visits</th>
+                <th>Average Visits/Day</th>
+                <th>Date of Highest Visits</th>
+                <th>Visits on {{ max_date.strftime('%B %d, %Y') }}</th>
+            </tr>
+            <tr>
+                <td>{{ start_date.strftime('%B %d, %Y') }} - {{ end_date.strftime('%B %d, %Y') }}</td> 
+                <td>{{ total_visits }}</td>
+                <td>{{ visits_per_day }}</td>
+                <td>{{ max_date.strftime('%B %d, %Y') }}</td>
+                <td>{{ max_visits }}</td>
+            </tr>
+        </table>
     </div> 
 {% endblock %}

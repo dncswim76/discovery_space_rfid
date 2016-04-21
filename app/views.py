@@ -1,6 +1,6 @@
 import os
 from app import app, db, login_manager
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import flash, g, jsonify, redirect, render_template, request, session, url_for
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from sqlalchemy import text
@@ -586,9 +586,103 @@ def manage_members():
 def member_metrics():
     ''' Admin interface for viewing and running membership reports.'''
 
-    # POST request runs specified report
+    # POST request calculates metrics for given date
     if request.method == "POST":
-        pass
+        # Calculate values based on given date range
+        if "run" in request.form:
+            # Get start date and cast to datetime object
+            start_date = request.form.get('start_date', type=str)
+            # If no start date is given, go since deployment date
+            if not start_date:
+                start_date = datetime.strptime(app.config['DEPLOY_DATE'], '%m/%d/%Y')
+            else:
+                start_date = datetime.strptime(start_date, '%m/%d/%Y')
+            # Make sure they do not enter a start date past today
+            if start_date > datetime.now():
+                flash(u'Invalid start date. Start date must be earlier than today.', 'error')
+                return redirect(url_for('member_metrics'))
+
+            # Get end_date and cast to datetime objects
+            end_date = request.form.get('end_date', type=str)
+            # If no end date is given, go with today
+            if not end_date:
+                end_date = datetime.now()
+            else:
+                end_date = datetime.strptime(end_date, '%m/%d/%Y') + timedelta(days=1)
+            # Make sure end date is not less than start date
+            if end_date < start_date:
+                flash(u'Invalid end date. End date must be earlier than start date.', 'error')
+                return redirect(url_for('member_metrics'))
+
+            # Visits in date range
+            total_visits = MemberVisit.query.filter(
+                    MemberVisit.date > start_date).filter(
+                    MemberVisit.date < end_date).count()
+            # Average visits in date range
+            delta = end_date - start_date
+            try:
+                visits_per_day = total_visits / delta.days
+            except ZeroDivisionError:
+                visits_per_day = 0
+
+            # Calculate date of highest attendance
+            date = start_date
+            max_date, max_visits = date, 0
+            while date < end_date:
+                # Calculate number of visits for that day
+                num_visits = MemberVisit.query.filter(
+                        MemberVisit.date > date).filter(
+                        MemberVisit.date < date + timedelta(days=1)).count()
+                # If new max, update max values
+                if num_visits > max_visits:
+                    max_visits = num_visits
+                    max_date = date
+                # Increment date
+                date += timedelta(days=1)
+
+            # Render template with calculated values
+            return render_template('member_metrics.html',
+                start_date=start_date,
+                end_date=end_date,
+                total_visits=total_visits,
+                visits_per_day=visits_per_day,
+                max_visits=max_visits,
+                max_date=max_date)
     # GET request renders template
     else:
-        return render_template('member_metrics.html')
+        # Render template with default values
+        start_date = datetime.strptime(app.config['DEPLOY_DATE'], '%m/%d/%Y')
+        end_date = datetime.now()
+        delta = end_date + timedelta(days=1) - start_date
+        total_visits = MemberVisit.query.filter(
+                            MemberVisit.date > start_date).filter(
+                            MemberVisit.date < end_date + timedelta(days=1)).count()
+        # Calculate average number of visits per day
+        try:
+            visits_per_day = total_visits / delta.days
+        except ZeroDivisionError:
+            visits_per_day = 0
+
+        # Calculate date of highest attendance
+        date = start_date
+        now = datetime.now()
+        max_date, max_visits = date, 0
+        while date < now:
+            # Calculate number of visits for that day
+            num_visits = MemberVisit.query.filter(
+                    MemberVisit.date > date).filter(
+                    MemberVisit.date < date + timedelta(days=1)).count()
+            # If new max, update max values
+            if num_visits > max_visits:
+                max_visits = num_visits
+                max_date = date
+            # Increment date
+            date += timedelta(days=1)
+
+        return render_template('member_metrics.html',
+                start_date=start_date,
+                end_date=now,
+                total_visits=total_visits,
+                visits_per_day=visits_per_day,
+                max_visits=max_visits,
+                max_date=max_date)
